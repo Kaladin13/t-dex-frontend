@@ -58,10 +58,9 @@ export async function onJettonAddressInput({
   const tonClient = getTonClient('testnet')
 
   const factory = await getFactory(tonClient)
-  const jettonVaultAddr = await factory.getJettonVaultAddr({
-    $$type: 'JettonVaultParams',
-    jettonMaster: Address.parse(address),
-  })
+  console.log(factory.address)
+  console.log(Address.parse(address).toRawString())
+  const jettonVaultAddr = await factory.getJettonVaultAddr(Address.parse(address))
 
   console.log(jettonVaultAddr.toString())
 }
