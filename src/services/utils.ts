@@ -1,4 +1,6 @@
 import { Address, TonClient } from '@ton/ton'
+import { TonConnectUI } from '@tonconnect/ui-react'
+import { Network } from '../components/NetworkSwitcher'
 
 async function sleep(time: number) {
   return new Promise((resolve) => {
@@ -35,4 +37,38 @@ export async function waitForSeqno(walletAddress: Address, client: TonClient) {
     }
     throw new Error('Timeout waiting for seqno!')
   }
+}
+
+// Mock: called when user inputs a jetton address
+export function onJettonAddressInput({
+  address,
+  tonConnectUI,
+  network,
+  extra,
+}: {
+  address: string;
+  tonConnectUI: TonConnectUI;
+  network: Network;
+  extra?: any;
+}) {
+  // You can implement fetching metadata, validation, etc. here
+  console.log('onJettonAddressInput', { address, tonConnectUI, network, extra });
+}
+
+// Mock: called when user inputs a balance/amount
+export function onBalanceInput({
+  amount,
+  token,
+  tonConnectUI,
+  network,
+  extra,
+}: {
+  amount: string;
+  token: any;
+  tonConnectUI: TonConnectUI;
+  network: Network;
+  extra?: any;
+}) {
+  // You can implement balance checks, quote fetching, etc. here
+  console.log('onBalanceInput', { amount, token, tonConnectUI, network, extra });
 }

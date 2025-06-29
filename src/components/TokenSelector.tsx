@@ -1,4 +1,7 @@
 import React, { useState, useRef } from 'react';
+import { useTonConnectUI } from '@tonconnect/ui-react';
+import { useNetwork } from '../contexts/NetworkContext';
+import { onJettonAddressInput } from '../services/utils';
 
 type Token = {
   symbol: string;
@@ -19,6 +22,8 @@ export default function TokenSelector({ tokens, selected, onSelect }: Props) {
   const [mode, setMode] = useState(selected.symbol === 'TON' ? 'ton' : 'custom');
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [tonConnectUI] = useTonConnectUI();
+  const { network } = useNetwork();
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -46,6 +51,7 @@ export default function TokenSelector({ tokens, selected, onSelect }: Props) {
     const addr = e.target.value;
     setCustomAddress(addr);
     onSelect({ symbol: 'JETTON', name: 'Custom Jetton', logo: '', balance: 0, address: addr });
+    onJettonAddressInput({ address: addr, tonConnectUI, network });
   };
 
   return (

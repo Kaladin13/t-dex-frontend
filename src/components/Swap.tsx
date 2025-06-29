@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useTonConnectUI } from '@tonconnect/ui-react';
+import { useNetwork } from '../contexts/NetworkContext';
+import { onBalanceInput } from '../services/utils';
 import TokenSelector from './TokenSelector';
 import './Swap.css';
 
@@ -14,6 +17,8 @@ export default function Swap() {
   const [fromAmount, setFromAmount] = useState('');
   const [toAmount, setToAmount] = useState('');
   const [swapping, setSwapping] = useState(false);
+  const [tonConnectUI] = useTonConnectUI();
+  const { network } = useNetwork();
 
   const handleSwapDirection = () => {
     setFromToken(toToken);
@@ -24,8 +29,8 @@ export default function Swap() {
 
   const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFromAmount(e.target.value);
-    // Mock price: 1:1 for now
     setToAmount(e.target.value);
+    onBalanceInput({ amount: e.target.value, token: fromToken, tonConnectUI, network });
   };
 
   const handleToAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
