@@ -15,9 +15,11 @@ type Props = {
   tokens: Token[];
   selected: Token;
   onSelect: (token: Token) => void;
+  jettonAddressStatus?: 'error' | 'success';
+  setJettonAddressStatus?: (status: 'error' | 'success' | undefined) => void;
 };
 
-export default function TokenSelector({ tokens, selected, onSelect }: Props) {
+export default function TokenSelector({ tokens, selected, onSelect, jettonAddressStatus, setJettonAddressStatus }: Props) {
   const [customAddress, setCustomAddress] = useState(selected.address || '');
   const [mode, setMode] = useState(selected.symbol === 'TON' ? 'ton' : 'custom');
   const [open, setOpen] = useState(false);
@@ -47,11 +49,18 @@ export default function TokenSelector({ tokens, selected, onSelect }: Props) {
     }
   };
 
-  const handleCustomAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCustomAddressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const addr = e.target.value;
     setCustomAddress(addr);
     onSelect({ symbol: 'JETTON', name: 'Custom Jetton', logo: '', balance: 0, address: addr });
-    onJettonAddressInput({ address: addr, tonConnectUI, network });
+    if (setJettonAddressStatus) setJettonAddressStatus(undefined);
+    try {
+      await onJettonAddressInput({ address: addr, tonConnectUI, network });
+      if (setJettonAddressStatus) setJettonAddressStatus('success');
+    } catch (err) {
+      console.log(err);
+      if (setJettonAddressStatus) setJettonAddressStatus('error');
+    }
   };
 
   return (
@@ -122,7 +131,18 @@ export default function TokenSelector({ tokens, selected, onSelect }: Props) {
           placeholder="Jetton address"
           value={customAddress}
           onChange={handleCustomAddressChange}
-          style={{ marginTop: 4, padding: '0.75rem', borderRadius: 12, border: 'none', background: '#23262f', color: '#fff', fontSize: '1.1rem' }}
+          style={{
+            marginTop: 4,
+            padding: '0.75rem',
+            borderRadius: 12,
+            border: jettonAddressStatus === 'error' ? '1.5px solid #f85149' : jettonAddressStatus === 'success' ? '1.5px solid #3fb950' : 'none',
+            background: '#23262f',
+            color: '#fff',
+            fontSize: '1.1rem',
+            outline: 'none',
+            boxShadow: jettonAddressStatus === 'error' ? '0 0 0 2px #f8514933' : jettonAddressStatus === 'success' ? '0 0 0 2px #3fb95033' : undefined,
+            transition: 'border 0.2s, box-shadow 0.2s',
+          }}
         />
       )}
     </div>

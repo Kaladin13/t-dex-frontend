@@ -53,10 +53,9 @@ export async function onJettonAddressInput({
   network: Network
   extra?: any
 }) {
-  // You can implement fetching metadata, validation, etc. here
   console.log('onJettonAddressInput', { address, tonConnectUI, network, extra })
 
-  const tonClient = await getTonClient('testnet')
+  const tonClient = getTonClient('testnet')
 
   const factory = await getFactory(tonClient)
   const jettonVaultAddr = await factory.getJettonVaultAddr({
@@ -68,7 +67,7 @@ export async function onJettonAddressInput({
 }
 
 // Mock: called when user inputs a balance/amount
-export function onBalanceInput({
+export async function onBalanceInput({
   amount,
   token,
   tonConnectUI,
@@ -81,6 +80,6 @@ export function onBalanceInput({
   network: Network
   extra?: any
 }) {
-  // You can implement balance checks, quote fetching, etc. here
+  // Simulate async work
   console.log('onBalanceInput', { amount, token, tonConnectUI, network, extra })
 }

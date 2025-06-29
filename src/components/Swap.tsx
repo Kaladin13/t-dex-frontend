@@ -19,6 +19,8 @@ export default function Swap() {
   const [swapping, setSwapping] = useState(false);
   const [tonConnectUI] = useTonConnectUI();
   const { network } = useNetwork();
+  const [jettonAddressStatusFrom, setJettonAddressStatusFrom] = useState<'error' | 'success' | undefined>();
+  const [jettonAddressStatusTo, setJettonAddressStatusTo] = useState<'error' | 'success' | undefined>();
 
   const handleSwapDirection = () => {
     setFromToken(toToken);
@@ -27,10 +29,10 @@ export default function Swap() {
     setToAmount(fromAmount);
   };
 
-  const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFromAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setFromAmount(e.target.value);
     setToAmount(e.target.value);
-    onBalanceInput({ amount: e.target.value, token: fromToken, tonConnectUI, network });
+    await onBalanceInput({ amount: e.target.value, token: fromToken, tonConnectUI, network });
   };
 
   const handleToAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,14 +50,26 @@ export default function Swap() {
       <h2>Swap</h2>
       <div className="swap-section">
         <span>From</span>
-        <TokenSelector tokens={mockTokens} selected={fromToken} onSelect={setFromToken} />
+        <TokenSelector
+          tokens={mockTokens}
+          selected={fromToken}
+          onSelect={setFromToken}
+          jettonAddressStatus={jettonAddressStatusFrom}
+          setJettonAddressStatus={setJettonAddressStatusFrom}
+        />
         <input type="number" value={fromAmount} onChange={handleFromAmountChange} placeholder="0.0" />
         <div className="balance">Balance: {fromToken.balance}</div>
       </div>
       <button className="swap-direction" onClick={handleSwapDirection}>&#8595;</button>
       <div className="swap-section">
         <span>To</span>
-        <TokenSelector tokens={mockTokens} selected={toToken} onSelect={setToToken} />
+        <TokenSelector
+          tokens={mockTokens}
+          selected={toToken}
+          onSelect={setToToken}
+          jettonAddressStatus={jettonAddressStatusTo}
+          setJettonAddressStatus={setJettonAddressStatusTo}
+        />
         <input type="number" value={toAmount} onChange={handleToAmountChange} placeholder="0.0" />
         <div className="balance">Balance: {toToken.balance}</div>
       </div>

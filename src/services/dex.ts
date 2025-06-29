@@ -1,9 +1,9 @@
 import { Address, TonClient } from '@ton/ton'
 import { Factory } from './wrappers/DEX_Factory'
 
-const DEX_FACTORY_ADDRESS = Address.parse(
-  'EQDFPTYGl95U6d8BorOCzgCNC6m9hkdipv6fNXxOxn9SnHtW',
-)
+const DEX_FACTORY_ADDRESS = Address.parse('EQDFPTYGl95U6d8BorOCzgCNC6m9hkdipv6fNXxOxn9SnHtW')
+
+const TON_VAULT_ADDRESS = Address.parse('EQDTsG5OoAbrtTRpYMHlmqDXwI9mj3Iv-wj-NNrNf0BDG-zD')
 
 export const getFactory = async (ton: TonClient) => {
   try {
