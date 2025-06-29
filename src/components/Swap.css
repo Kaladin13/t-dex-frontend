@@ -67,4 +67,78 @@
   font-size: 0.9rem;
   color: #aaa;
   align-self: flex-end;
+}
+
+.tact-dropdown {
+  width: 100%;
+  position: relative;
+}
+
+.tact-dropdown-btn {
+  width: 100%;
+  background: #23262f;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,170,255,0.04);
+}
+.tact-dropdown-btn:focus, .tact-dropdown-btn:hover {
+  background: #1a2233;
+  color: #00aaff;
+  box-shadow: 0 4px 16px rgba(0,170,255,0.10);
+}
+
+.tact-dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: #23262f;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,170,255,0.10);
+  z-index: 10;
+  overflow: hidden;
+  border: 1px solid #00aaff33;
+}
+
+.tact-dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 1.05rem;
+  transition: background 0.15s, color 0.15s;
+  background: none;
+}
+.tact-dropdown-item:hover, .tact-dropdown-item:focus {
+  background: #00aaff22;
+  color: #00aaff;
+}
+.tact-dropdown-item.selected {
+  background: #00aaff33;
+  color: #00aaff;
+  font-weight: 600;
+}
+
+/* Custom input for jetton address */
+.swap-section input[type="text"] {
+  background: #181a20;
+  border: 1px solid #00aaff33;
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.swap-section input[type="text"]:focus {
+  border: 1.5px solid #00aaff;
+  box-shadow: 0 0 0 2px #00aaff33;
+  outline: none;
 } 
