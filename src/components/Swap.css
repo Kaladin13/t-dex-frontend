@@ -1,0 +1,70 @@
+.swap-card {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 2rem;
+  background: #181a20;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.swap-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.swap-section input {
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: none;
+  font-size: 1.2rem;
+  background: #23262f;
+  color: #fff;
+}
+
+.swap-direction {
+  align-self: center;
+  background: #23262f;
+  border: none;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.5rem;
+  color: #fff;
+  cursor: pointer;
+  margin: 0.5rem 0;
+}
+
+.swap-btn {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #00aaff;
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.swap-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.swap-info {
+  font-size: 0.95rem;
+  color: #aaa;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.balance {
+  font-size: 0.9rem;
+  color: #aaa;
+  align-self: flex-end;
+} 

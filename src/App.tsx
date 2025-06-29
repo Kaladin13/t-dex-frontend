@@ -2,6 +2,7 @@ import { FC } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { TonConnectButton } from '@tonconnect/ui-react'
 import JettonMinter from './components/JettonMinter'
+import Swap from './components/Swap'
 import './styles/App.css'
 import './styles/JettonMinter.css'
 
@@ -24,7 +25,7 @@ export const App: FC = () => {
         <Routes>
           <Route
             path='/'
-            element={<JettonMinter />}
+            element={<Swap />}
           />
         </Routes>
       </div>
