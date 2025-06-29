@@ -1,6 +1,8 @@
 import { Address, TonClient } from '@ton/ton'
 import { TonConnectUI } from '@tonconnect/ui-react'
 import { Network } from '../components/NetworkSwitcher'
+import { getTonClient } from './client'
+import { getFactory } from './dex'
 
 async function sleep(time: number) {
   return new Promise((resolve) => {
@@ -40,19 +42,29 @@ export async function waitForSeqno(walletAddress: Address, client: TonClient) {
 }
 
 // Mock: called when user inputs a jetton address
-export function onJettonAddressInput({
+export async function onJettonAddressInput({
   address,
   tonConnectUI,
   network,
   extra,
 }: {
-  address: string;
-  tonConnectUI: TonConnectUI;
-  network: Network;
-  extra?: any;
+  address: string
+  tonConnectUI: TonConnectUI
+  network: Network
+  extra?: any
 }) {
   // You can implement fetching metadata, validation, etc. here
-  console.log('onJettonAddressInput', { address, tonConnectUI, network, extra });
+  console.log('onJettonAddressInput', { address, tonConnectUI, network, extra })
+
+  const tonClient = await getTonClient('testnet')
+
+  const factory = await getFactory(tonClient)
+  const jettonVaultAddr = await factory.getJettonVaultAddr({
+    $$type: 'JettonVaultParams',
+    jettonMaster: Address.parse(address),
+  })
+
+  console.log(jettonVaultAddr.toString())
 }
 
 // Mock: called when user inputs a balance/amount
@@ -63,12 +75,12 @@ export function onBalanceInput({
   network,
   extra,
 }: {
-  amount: string;
-  token: any;
-  tonConnectUI: TonConnectUI;
-  network: Network;
-  extra?: any;
+  amount: string
+  token: any
+  tonConnectUI: TonConnectUI
+  network: Network
+  extra?: any
 }) {
   // You can implement balance checks, quote fetching, etc. here
-  console.log('onBalanceInput', { amount, token, tonConnectUI, network, extra });
+  console.log('onBalanceInput', { amount, token, tonConnectUI, network, extra })
 }

@@ -8,6 +8,7 @@ export const getTonClient = async (network: Network) => {
   })
 
   return new TonClient({
-    endpoint,
+    endpoint: 'https://testnet.toncenter.com/api/v2/jsonRPC',
+    apiKey: 'ab70221ff1418fc7d9f931cf4d3220041fac2a7be6dc4bfc78ea070bb4ef5606',
   })
 }
