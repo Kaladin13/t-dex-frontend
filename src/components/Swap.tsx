@@ -65,7 +65,7 @@ export default function Swap() {
   const handleFromAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/,/, '.')
     setFromAmount(val)
-    setToAmount(val)
+    // setToAmount(val)
 
     await onBalanceInput({
       amount: val,
@@ -74,15 +74,24 @@ export default function Swap() {
       fromToken,
       toToken,
       swapType: 'exactIn',
+      setToAmount,
     })
   }
 
-  const handleToAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/,/, '.')
     setToAmount(val)
-    setFromAmount(val)
+    // setFromAmount(val)
 
-    // TODO: amountNeededToGetX
+    await onBalanceInput({
+      amount: val,
+      tonConnectUI,
+      network,
+      fromToken,
+      toToken,
+      swapType: 'exactOut',
+      setFromAmount,
+    })
   }
 
   const setAmountFromBalance = (fraction: number) => {

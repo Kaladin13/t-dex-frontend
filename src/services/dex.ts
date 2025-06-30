@@ -116,6 +116,8 @@ export async function onBalanceInput({
   fromToken,
   toToken,
   swapType,
+  setToAmount,
+  setFromAmount,
 }: {
   amount: string
   tonConnectUI: TonConnectUI
@@ -123,6 +125,8 @@ export async function onBalanceInput({
   fromToken: Token
   toToken: Token
   swapType: 'exactIn' | 'exactOut'
+  setToAmount?: (amount: string) => void
+  setFromAmount?: (amount: string) => void
 }): Promise<void> {
   const tonClient = getTonClient('testnet')
   const factory = await getFactory(tonClient)
@@ -147,7 +151,7 @@ export async function onBalanceInput({
     const amountOut = await ammPool.getExpectedOut(vaultFrom.address, BigInt(amountIn))
 
     console.log(`Estimated output amount: ${amountOut}`)
-    // set toAmount(amountOut.toString())
+    if (setToAmount) setToAmount(amountOut.toString())
   }
 
   if (swapType === 'exactOut') {
@@ -155,7 +159,7 @@ export async function onBalanceInput({
     const amountIn = await ammPool.getNeededInToGetX(vaultTo.address, BigInt(amountOut))
 
     console.log(`Estimated input amount: ${amountIn}`)
-    // set fromAmount(amountIn.toString())
+    if (setFromAmount) setFromAmount(amountIn.toString())
   }
 }
 
