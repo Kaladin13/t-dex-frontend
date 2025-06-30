@@ -31,19 +31,15 @@ export async function onJettonAddressInput({
   address,
   tonConnectUI,
   network,
-  extra,
   setVaultAddress,
   onSelect,
 }: {
   address: string
   tonConnectUI: TonConnectUI
   network: Network
-  extra?: unknown
   setVaultAddress?: (vault: string) => void
   onSelect: (token: Token) => void
 }): Promise<void> {
-  console.log('onJettonAddressInput', { address, tonConnectUI, network, extra })
-
   const tonClient = getTonClient('testnet')
 
   const jettonAddress = Address.parse(address)
@@ -88,25 +84,26 @@ export async function onJettonAddressInput({
   })
 }
 
+const handleExactIn = async () => {}
+
 export async function onBalanceInput({
   amount,
-  token,
+  swapType,
   tonConnectUI,
   network,
-  extra,
   fromToken,
   toToken,
 }: {
+  swapType: 'exactIn' | 'exactOut'
   amount: string
-  token: Token
   tonConnectUI: TonConnectUI
   network: Network
-  extra?: unknown
-  fromToken?: Token
-  toToken?: Token
+  fromToken: Token
+  toToken: Token
 }): Promise<void> {
   // Simulate async work
-  console.log('onBalanceInput', { amount, token, tonConnectUI, network, extra, fromToken, toToken })
+  if (swapType === 'exactIn') {
+  }
 
   if (fromToken?.type === 'jetton') {
     // Here you would typically call a function to handle the jetton balance input

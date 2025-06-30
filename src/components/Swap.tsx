@@ -28,8 +28,8 @@ const mockTokens: Token[] = [
 ]
 
 export default function Swap() {
-  const [fromToken, setFromToken] = useState<Token>(mockTokens[0])
-  const [toToken, setToToken] = useState<Token>(mockTokens[1])
+  const [fromToken, setFromToken] = useState<Token>(mockTokens[0]!)
+  const [toToken, setToToken] = useState<Token>(mockTokens[1]!)
   const [fromAmount, setFromAmount] = useState('')
   const [toAmount, setToAmount] = useState('')
   const [swapping, setSwapping] = useState(false)
@@ -64,7 +64,6 @@ export default function Swap() {
     // TODO: get actual amount
     await onBalanceInput({
       amount: e.target.value,
-      token: fromToken,
       tonConnectUI,
       network,
       fromToken,
