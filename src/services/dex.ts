@@ -169,7 +169,7 @@ export async function fetchTonBalance({
   setBalance: (balance: string) => void
 }): Promise<void> {
   try {
-    const client = await getTonClient(network)
+    const client = getTonClient(network)
     const address = tonConnectUI.account?.address
     if (!address) return setBalance('0')
     const balance = await client.getBalance(Address.parse(address))
