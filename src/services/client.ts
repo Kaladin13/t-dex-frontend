@@ -10,7 +10,6 @@ export const getTonClient = (network: Network) => {
   } else {
     client = new TonClient({
       endpoint: 'https://testnet.toncenter.com/api/v2/jsonRPC',
-      apiKey: '-',
     })
 
     return client
