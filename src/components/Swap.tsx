@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTonConnectUI, useTonAddress, useTonConnectModal } from '@tonconnect/ui-react'
 import { useNetwork } from '../contexts/NetworkContext'
-import { onBalanceInput, Token, fetchTonBalance } from '../services/dex'
+import { onBalanceInput, Token, fetchTonBalance, handleFromSwapAction } from '../services/dex'
 import TokenSelector from './TokenSelector'
 import './Swap.css'
 import TonLogo from '../assets/ton-logo.svg'
@@ -108,7 +108,9 @@ export default function Swap() {
     })
     setFromAmount(amountString)
     // Also trigger the dependent updates
-    handleFromAmountChange({ target: { value: amountString } } as React.ChangeEvent<HTMLInputElement>)
+    handleFromAmountChange({
+      target: { value: amountString },
+    } as React.ChangeEvent<HTMLInputElement>)
   }
 
   const handleFromTokenSelect = (token: Token) => {
@@ -139,7 +141,8 @@ export default function Swap() {
 
   const handleSwap = () => {
     setSwapping(true)
-    setTimeout(() => setSwapping(false), 1500)
+    handleFromSwapAction(tonConnectUI, fromToken, toToken, fromAmount)
+    setTimeout(() => setSwapping(false), 40000)
   }
 
   const formatBalanceForDisplay = (token: Token) => {
