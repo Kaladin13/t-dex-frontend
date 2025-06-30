@@ -43,6 +43,8 @@
 .input-wrapper {
   flex-grow: 1;
   text-align: right;
+  display: flex;
+  flex-direction: column;
 }
 
 .amount-input {
@@ -65,6 +67,36 @@
   font-size: 1rem;
   color: #aaa;
   margin-top: 0.25rem;
+}
+
+.amount-setter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.amount-button {
+  background: #23262f;
+  color: #00aaff;
+  border: 1px solid #00aaff33;
+  border-radius: 8px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.amount-button:hover:not(:disabled) {
+  background: #00aaff22;
+  border-color: #00aaff;
+}
+
+.amount-button:disabled {
+  color: #555;
+  border-color: #55555533;
+  cursor: not-allowed;
 }
 
 .swap-direction {

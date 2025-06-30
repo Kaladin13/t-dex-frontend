@@ -83,8 +83,24 @@ export default function Swap() {
     // TODO: amountNeededToGetX
   }
 
+  const setAmountFromBalance = (fraction: number) => {
+    if (!userAddress) return
+
+    const balanceString = fromToken.type === 'ton' ? tonBalance : fromNano(fromToken.balance)
+    const balance = parseFloat(balanceString)
+    if (isNaN(balance)) return
+
+    const amount = balance * fraction
+    const amountString = amount.toString()
+    setFromAmount(amountString)
+    // Also trigger the dependent updates
+    handleFromAmountChange({ target: { value: amountString } } as React.ChangeEvent<HTMLInputElement>)
+  }
+
   const handleFromTokenSelect = (token: Token) => {
     setFromToken(token)
+    setFromAmount('')
+    setToAmount('')
     // console.log(token)
 
     if (token.type === 'jetton') {
@@ -96,6 +112,8 @@ export default function Swap() {
 
   const handleToTokenSelect = (token: Token) => {
     setToToken(token)
+    setFromAmount('')
+    setToAmount('')
     // console.log(token)
 
     if (token.type === 'jetton') {
@@ -110,11 +128,23 @@ export default function Swap() {
     setTimeout(() => setSwapping(false), 1500)
   }
 
-  const getDisplayBalance = (token: Token) => {
+  const formatBalanceForDisplay = (token: Token) => {
     if (!userAddress) return '-'
-    if (token.type === 'ton') return tonBalance
-    return token.balance.toString()
+    let balanceStr = '0'
+    if (token.type === 'ton') {
+      balanceStr = tonBalance
+    } else {
+      if (token.balance === 0n) return '0.0000'
+      balanceStr = fromNano(token.balance)
+    }
+    const balance = parseFloat(balanceStr)
+    if (isNaN(balance)) return '0.0000'
+    // show more precision for small balances
+    return balance.toFixed(balance > 0 && balance < 0.0001 ? 8 : 4)
   }
+
+  const isAmountSelectorDisabled =
+    !userAddress || (fromToken.type === 'jetton' && jettonAddressStatusFrom !== 'success')
 
   return (
     <div className='swap-card'>
@@ -122,7 +152,7 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>From</span>
-          <div className='balance'>Balance: {getDisplayBalance(fromToken)}</div>
+          <div className='balance'>Balance: {formatBalanceForDisplay(fromToken)}</div>
         </div>
         <div className='token-input-row'>
           <TokenSelector
@@ -141,6 +171,22 @@ export default function Swap() {
               placeholder='0'
               className='amount-input'
             />
+            <div className='amount-setter'>
+              <button
+                onClick={() => setAmountFromBalance(0.5)}
+                disabled={isAmountSelectorDisabled}
+                className='amount-button'
+              >
+                Half
+              </button>
+              <button
+                onClick={() => setAmountFromBalance(1)}
+                disabled={isAmountSelectorDisabled}
+                className='amount-button'
+              >
+                Max
+              </button>
+            </div>
             <div className='amount-usd'>$0.00</div>
           </div>
         </div>
@@ -154,7 +200,7 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>To</span>
-          <div className='balance'>Balance: {getDisplayBalance(toToken)}</div>
+          <div className='balance'>Balance: {formatBalanceForDisplay(toToken)}</div>
         </div>
         <div className='token-input-row'>
           <TokenSelector
