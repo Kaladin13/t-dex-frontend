@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useTonConnectUI } from '@tonconnect/ui-react'
 import { useNetwork } from '../contexts/NetworkContext'
 import { onJettonAddressInput, Token } from '../services/dex'
+import TonLogo from '../assets/ton-logo.svg'
+import JettonLogo from '../assets/jetton-logo.svg'
 
 type Props = {
   tokens: Token[]
@@ -18,11 +20,14 @@ export default function TokenSelector({
   onSelect,
   jettonAddressStatus,
   setJettonAddressStatus,
+  setVaultAddress,
 }: Props) {
-  const [customAddress, setCustomAddress] = useState(selected.address || '')
-  const [mode, setMode] = useState(selected.symbol === 'TON' ? 'ton' : 'custom')
+  const [customAddress, setCustomAddress] = useState(
+    selected.type === 'jetton' ? selected.address : '',
+  )
+  const [mode, setMode] = useState(selected.type)
   const [open, setOpen] = useState(false)
-  const [vaultAddress, setVaultAddress] = useState<string | undefined>()
+  const [vaultAddress, setVaultAddressLocal] = useState<string | undefined>()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [tonConnectUI] = useTonConnectUI()
   const { network } = useNetwork()
@@ -43,7 +48,7 @@ export default function TokenSelector({
 
   // Update token with vault address if set
   useEffect(() => {
-    if (vaultAddress && mode === 'custom' && customAddress) {
+    if (vaultAddress && mode === 'jetton' && customAddress) {
       onSelect({
         type: 'jetton',
         symbol: 'JETTON',
@@ -57,7 +62,7 @@ export default function TokenSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vaultAddress])
 
-  const handleModeChange = (value: 'ton' | 'custom') => {
+  const handleModeChange = (value: 'ton' | 'jetton') => {
     setMode(value)
     setOpen(false)
     if (value === 'ton') {
@@ -99,7 +104,7 @@ export default function TokenSelector({
         address: addr,
         tonConnectUI,
         network,
-        setVaultAddress,
+        setVaultAddress: setVaultAddress,
         onSelect,
       })
 
@@ -108,6 +113,13 @@ export default function TokenSelector({
       console.log(err)
       if (setJettonAddressStatus) setJettonAddressStatus('error')
     }
+  }
+
+  const getLogoSrc = (token: Token) => {
+    console.log(token.logo)
+    if (token.logo) return token.logo
+    if (token.type === 'ton') return TonLogo
+    return JettonLogo
   }
 
   return (
@@ -137,7 +149,14 @@ export default function TokenSelector({
             justifyContent: 'space-between',
           }}
         >
-          {mode === 'ton' ? 'TON' : 'Custom Jetton'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexGrow: 1 }}>
+            <img
+              src={getLogoSrc(selected)}
+              alt={`${selected.symbol} logo`}
+              style={{ width: 24, height: 24, borderRadius: '50%' }}
+            />
+            <span style={{ fontWeight: 'bold' }}>{selected.name}</span>
+          </div>
           <span style={{ marginLeft: 8, fontSize: 18, color: '#aaa' }}>▼</span>
         </button>
         {open && (
@@ -174,17 +193,17 @@ export default function TokenSelector({
                 padding: '0.75rem 1rem',
                 cursor: 'pointer',
                 color: '#fff',
-                fontWeight: mode === 'custom' ? 600 : 400,
-                background: mode === 'custom' ? '#181a20' : 'none',
+                fontWeight: mode === 'jetton' ? 600 : 400,
+                background: mode === 'jetton' ? '#181a20' : 'none',
               }}
-              onClick={() => handleModeChange('custom')}
+              onClick={() => handleModeChange('jetton')}
             >
               Custom Jetton
             </div>
           </div>
         )}
       </div>
-      {mode === 'custom' && (
+      {mode === 'jetton' && (
         <input
           type='text'
           placeholder='Jetton address'

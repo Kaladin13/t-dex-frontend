@@ -2,7 +2,7 @@ import { TonConnectUI } from '@tonconnect/ui-react'
 import { Network } from '../components/NetworkSwitcher'
 import { getTonClient } from './client'
 import { getFactory } from './dex-factory'
-import { Address } from '@ton/core'
+import { Address, TonClient } from '@ton/ton'
 import { JettonMinterFeatureRich } from './wrappers/FeatureRich_JettonMinterFeatureRich'
 import { JettonWalletFeatureRich } from './wrappers/FeatureRich_JettonWalletFeatureRich'
 import { parseMetadataFromCell } from './jetton-helpers'
@@ -12,7 +12,7 @@ type TonToken = {
   symbol: string
   name: string
   logo: string
-  balance: number
+  balance: bigint
 }
 
 type JettonToken = {
@@ -78,7 +78,8 @@ export async function onJettonAddressInput({
     address,
     balance: userBalance,
     name: parsedData.name!,
-    logo: parsedData.image!,
+    // todo: actual logo
+    logo: 'https://raw.githubusercontent.com/tact-lang/tact/refs/heads/main/docs/public/logomark-light.png',
     symbol: parsedData.symbol!,
     vaultAddress: jettonVaultAddr.toString(),
   })
@@ -88,18 +89,18 @@ const handleExactIn = async () => {}
 
 export async function onBalanceInput({
   amount,
-  swapType,
   tonConnectUI,
   network,
   fromToken,
   toToken,
+  swapType,
 }: {
-  swapType: 'exactIn' | 'exactOut'
   amount: string
   tonConnectUI: TonConnectUI
   network: Network
   fromToken: Token
   toToken: Token
+  swapType: 'exactIn' | 'exactOut'
 }): Promise<void> {
   // Simulate async work
   if (swapType === 'exactIn') {
@@ -107,10 +108,12 @@ export async function onBalanceInput({
 
   if (fromToken?.type === 'jetton') {
     // Here you would typically call a function to handle the jetton balance input
-    console.log(`Handling jetton balance input for ${token.symbol} at address ${token?.name}`)
+    console.log(
+      `Handling jetton balance input for ${fromToken.symbol} at address ${fromToken?.name}`,
+    )
   }
-  if (token.type === 'ton') {
+  if (fromToken?.type === 'ton') {
     // Here you would typically call a function to handle the TON balance input
-    console.log(`Handling TON balance input for ${token.symbol}`)
+    console.log(`Handling TON balance input for ${fromToken.symbol}`)
   }
 }

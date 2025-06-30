@@ -4,27 +4,21 @@ import { useNetwork } from '../contexts/NetworkContext'
 import { onBalanceInput, Token } from '../services/dex'
 import TokenSelector from './TokenSelector'
 import './Swap.css'
+import TonLogo from '../assets/ton-logo.svg'
+
+const TactTokenA: Token = {
+  type: 'jetton',
+  address: 'kQBCzXhQNxS727KxwsHld8aVNoFpSka0Xzr3GUBOxC_l2gQM',
+  balance: 0n,
+  name: 'TactTokenA',
+  logo: 'https://raw.githubusercontent.com/tact-lang/tact/refs/heads/main/docs/public/logomark-light.svg',
+  symbol: 'A',
+  vaultAddress: 'EQBBWii_pqdQWcWQ9pWPC7lt1qoNngdZ9TuUMgT81TFgQpi1',
+}
 
 const mockTokens: Token[] = [
-  { type: 'ton', symbol: 'TON', name: 'Toncoin', logo: '', balance: 100 },
-  {
-    type: 'jetton',
-    symbol: 'USDT',
-    name: 'Tether USD',
-    logo: '',
-    balance: 2500n,
-    address: 'EQC_usdt',
-    vaultAddress: '',
-  },
-  {
-    type: 'jetton',
-    symbol: 'JET',
-    name: 'Jetton',
-    logo: '',
-    balance: 5000n,
-    address: 'EQC_jet',
-    vaultAddress: '',
-  },
+  { type: 'ton', symbol: 'TON', name: 'Toncoin', logo: TonLogo, balance: 10000000000n },
+  TactTokenA,
 ]
 
 export default function Swap() {
@@ -68,6 +62,7 @@ export default function Swap() {
       network,
       fromToken,
       toToken,
+      swapType: 'exactIn',
     })
   }
 
@@ -80,8 +75,8 @@ export default function Swap() {
 
   const handleFromTokenSelect = (token: Token) => {
     setFromToken(token)
+    console.log(token)
 
-    // highlevel set
     if (token.type === 'jetton') {
       setVaultAddressFrom(token.vaultAddress)
     } else {
@@ -91,6 +86,7 @@ export default function Swap() {
 
   const handleToTokenSelect = (token: Token) => {
     setToToken(token)
+    console.log(token)
 
     if (token.type === 'jetton') {
       setVaultAddressTo(token.vaultAddress)
@@ -101,7 +97,6 @@ export default function Swap() {
 
   const handleSwap = () => {
     setSwapping(true)
-    // send actual swap
     setTimeout(() => setSwapping(false), 1500)
   }
 
@@ -109,8 +104,11 @@ export default function Swap() {
     <div className='swap-card'>
       <h2>Swap</h2>
       <div className='swap-section'>
-        <span>From</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className='token-select-header'>
+          <span>From</span>
+          <div className='balance'>Balance: {fromToken.balance.toString()}</div>
+        </div>
+        <div className='token-input-row'>
           <TokenSelector
             tokens={mockTokens}
             selected={fromToken}
@@ -119,19 +117,17 @@ export default function Swap() {
             setJettonAddressStatus={setJettonAddressStatusFrom}
             setVaultAddress={setVaultAddressFrom}
           />
-          {fromToken.type === 'jetton' && fromToken.vaultAddress && (
-            <span style={{ color: '#3fb950', fontSize: 12, marginLeft: 8 }}>
-              Vault: {fromToken.vaultAddress}
-            </span>
-          )}
+          <div className='input-wrapper'>
+            <input
+              type='number'
+              value={fromAmount}
+              onChange={handleFromAmountChange}
+              placeholder='0'
+              className='amount-input'
+            />
+            <div className='amount-usd'>$0.00</div>
+          </div>
         </div>
-        <input
-          type='number'
-          value={fromAmount}
-          onChange={handleFromAmountChange}
-          placeholder='0.0'
-        />
-        <div className='balance'>Balance: {fromToken.balance}</div>
       </div>
       <button
         className='swap-direction'
@@ -140,8 +136,11 @@ export default function Swap() {
         &#8595;
       </button>
       <div className='swap-section'>
-        <span>To</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className='token-select-header'>
+          <span>To</span>
+          <div className='balance'>Balance: {toToken.balance.toString()}</div>
+        </div>
+        <div className='token-input-row'>
           <TokenSelector
             tokens={mockTokens}
             selected={toToken}
@@ -150,19 +149,17 @@ export default function Swap() {
             setJettonAddressStatus={setJettonAddressStatusTo}
             setVaultAddress={setVaultAddressTo}
           />
-          {toToken.type === 'jetton' && toToken.vaultAddress && (
-            <span style={{ color: '#3fb950', fontSize: 12, marginLeft: 8 }}>
-              Vault: {toToken.vaultAddress}
-            </span>
-          )}
+          <div className='input-wrapper'>
+            <input
+              type='number'
+              value={toAmount}
+              onChange={handleToAmountChange}
+              placeholder='0'
+              className='amount-input'
+            />
+            <div className='amount-usd'>$0.00</div>
+          </div>
         </div>
-        <input
-          type='number'
-          value={toAmount}
-          onChange={handleToAmountChange}
-          placeholder='0.0'
-        />
-        <div className='balance'>Balance: {toToken.balance}</div>
       </div>
       <div className='swap-info'>
         <div>

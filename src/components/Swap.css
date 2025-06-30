@@ -15,15 +15,56 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  background: #181a20;
+  padding: 1rem;
+  border-radius: 1rem;
 }
 
-.swap-section input {
-  padding: 0.75rem;
-  border-radius: 0.75rem;
+.token-select-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 0.5rem;
+}
+
+.token-input-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.token-input-row .tact-dropdown {
+  flex-shrink: 0;
+  width: 150px;
+}
+
+.input-wrapper {
+  flex-grow: 1;
+  text-align: right;
+}
+
+.amount-input {
+  background: none;
   border: none;
-  font-size: 1.2rem;
-  background: #23262f;
   color: #fff;
+  font-size: 2rem;
+  font-weight: 500;
+  width: 100%;
+  text-align: right;
+  padding: 0;
+  outline: none;
+}
+
+.amount-input::placeholder {
+  color: #555;
+}
+
+.amount-usd {
+  font-size: 1rem;
+  color: #aaa;
+  margin-top: 0.25rem;
 }
 
 .swap-direction {
@@ -66,7 +107,6 @@
 .balance {
   font-size: 0.9rem;
   color: #aaa;
-  align-self: flex-end;
 }
 
 .tact-dropdown {
