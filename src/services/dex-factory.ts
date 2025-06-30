@@ -4,7 +4,7 @@ import { TonVault } from './wrappers/DEX_TonVault'
 import { JettonVault } from './wrappers/DEX_JettonVault'
 import { AmmPool } from './wrappers/DEX_AmmPool'
 
-const DEX_FACTORY_ADDRESS = Address.parse('EQBJiBXaBqHEDO108PBuKxWGseG_tWxeFOwAGRiU4fRGyQmL')
+const DEX_FACTORY_ADDRESS = Address.parse('EQDR9j1SuiGtbSi7NZNgNwlDPIWZFEN5BLMz6AOd-IpGuslM')
 
 const TON_VAULT_ADDRESS = Address.parse('EQDTsG5OoAbrtTRpYMHlmqDXwI9mj3Iv-wj-NNrNf0BDG-zD')
 

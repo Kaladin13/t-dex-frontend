@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTonConnectUI, useTonAddress, useTonConnectModal } from '@tonconnect/ui-react'
 import { useNetwork } from '../contexts/NetworkContext'
-import { onBalanceInput, Token } from '../services/dex'
+import { onBalanceInput, Token, fetchTonBalance } from '../services/dex'
 import TokenSelector from './TokenSelector'
 import './Swap.css'
 import TonLogo from '../assets/ton-logo.svg'
+import { fromNano } from '@ton/core'
 
 const TactTokenA: Token = {
   type: 'jetton',
@@ -41,6 +42,14 @@ export default function Swap() {
   >()
   const [vaultAddressFrom, setVaultAddressFrom] = useState<string | undefined>()
   const [vaultAddressTo, setVaultAddressTo] = useState<string | undefined>()
+  const [tonBalance, setTonBalance] = useState<string>('0')
+
+  useEffect(() => {
+    if (!userAddress || !tonConnectUI) return
+    if (fromToken.type === 'ton' || toToken.type === 'ton') {
+      fetchTonBalance({ tonConnectUI, network, setBalance: setTonBalance })
+    }
+  }, [userAddress, tonConnectUI, fromToken, toToken, network])
 
   const handleSwapDirection = () => {
     setFromToken(toToken)
@@ -57,7 +66,6 @@ export default function Swap() {
     setFromAmount(e.target.value)
     setToAmount(e.target.value)
 
-    // TODO: get actual amount
     await onBalanceInput({
       amount: e.target.value,
       tonConnectUI,
@@ -77,7 +85,7 @@ export default function Swap() {
 
   const handleFromTokenSelect = (token: Token) => {
     setFromToken(token)
-    console.log(token)
+    // console.log(token)
 
     if (token.type === 'jetton') {
       setVaultAddressFrom(token.vaultAddress)
@@ -88,7 +96,7 @@ export default function Swap() {
 
   const handleToTokenSelect = (token: Token) => {
     setToToken(token)
-    console.log(token)
+    // console.log(token)
 
     if (token.type === 'jetton') {
       setVaultAddressTo(token.vaultAddress)
@@ -102,13 +110,19 @@ export default function Swap() {
     setTimeout(() => setSwapping(false), 1500)
   }
 
+  const getDisplayBalance = (token: Token) => {
+    if (!userAddress) return '-'
+    if (token.type === 'ton') return tonBalance
+    return token.balance.toString()
+  }
+
   return (
     <div className='swap-card'>
       <h2>Swap</h2>
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>From</span>
-          <div className='balance'>Balance: {userAddress ? fromToken.balance.toString() : '-'}</div>
+          <div className='balance'>Balance: {getDisplayBalance(fromToken)}</div>
         </div>
         <div className='token-input-row'>
           <TokenSelector
@@ -140,7 +154,7 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>To</span>
-          <div className='balance'>Balance: {userAddress ? toToken.balance.toString() : '-'}</div>
+          <div className='balance'>Balance: {getDisplayBalance(toToken)}</div>
         </div>
         <div className='token-input-row'>
           <TokenSelector

@@ -7,7 +7,7 @@ import {
   getJettonVaultFromAddress,
   getTonVault,
 } from './dex-factory'
-import { Address, TonClient } from '@ton/ton'
+import { Address, fromNano, TonClient } from '@ton/ton'
 import { JettonMinterFeatureRich } from './wrappers/FeatureRich_JettonMinterFeatureRich'
 import { JettonWalletFeatureRich } from './wrappers/FeatureRich_JettonWalletFeatureRich'
 import { parseMetadataFromCell } from './jetton-helpers'
@@ -74,7 +74,7 @@ export async function onJettonAddressInput({
     )
 
     const userJettonData = await userJettonWallet.getGetWalletData()
-    userBalance = userJettonData.balance
+    userBalance = BigInt(fromNano(userJettonData.balance))
   }
 
   // TODO: get actual jetton info here
@@ -100,12 +100,14 @@ const getVaultFromToken = async (tonClient: TonClient, token: Token) => {
 }
 
 declare global {
-    interface BigInt {
-        toJSON(): number;
-    }
+  interface BigInt {
+    toJSON(): number
+  }
 }
 
-BigInt.prototype.toJSON = function () { return Number(this) }
+BigInt.prototype.toJSON = function () {
+  return Number(this)
+}
 
 export async function onBalanceInput({
   amount,
@@ -125,8 +127,8 @@ export async function onBalanceInput({
   const tonClient = getTonClient('testnet')
   const factory = await getFactory(tonClient)
 
-  console.log(`token from: ${JSON.stringify(fromToken)}`);
-  console.log(`to from: ${JSON.stringify(toToken)}`);
+  console.log(`token from: ${JSON.stringify(fromToken)}`)
+  console.log(`to from: ${JSON.stringify(toToken)}`)
 
   const vaultFrom = await getVaultFromToken(tonClient, fromToken)
   const vaultTo = await getVaultFromToken(tonClient, toToken)
@@ -136,11 +138,7 @@ export async function onBalanceInput({
     return
   }
 
-  const ammPoolAddress = await factory.getAmmPoolAddr({
-    $$type: 'AmmPoolParams',
-    firstVault: vaultFrom.address,
-    secondVault: vaultTo.address,
-  })
+  const ammPoolAddress = await factory.getAmmPoolAddr(vaultFrom.address, vaultTo.address)
 
   const ammPool = await getAmmPoolFromAddress(tonClient, ammPoolAddress)
 
@@ -158,5 +156,25 @@ export async function onBalanceInput({
 
     console.log(`Estimated input amount: ${amountIn}`)
     // set fromAmount(amountIn.toString())
+  }
+}
+
+export async function fetchTonBalance({
+  tonConnectUI,
+  network,
+  setBalance,
+}: {
+  tonConnectUI: TonConnectUI
+  network: Network
+  setBalance: (balance: string) => void
+}): Promise<void> {
+  try {
+    const client = await getTonClient(network)
+    const address = tonConnectUI.account?.address
+    if (!address) return setBalance('0')
+    const balance = await client.getBalance(Address.parse(address))
+    setBalance(fromNano(balance))
+  } catch (e) {
+    setBalance('0')
   }
 }

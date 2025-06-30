@@ -118,7 +118,6 @@ export default function TokenSelector({
   };
 
   const getLogoSrc = (token: Token) => {
-    console.log(token.logo)
     if (token.logo) return token.logo
     if (token.type === 'ton') return TonLogo
     return JettonLogo
