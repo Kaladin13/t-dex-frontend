@@ -158,8 +158,8 @@
   background: none;
 }
 .tact-dropdown-item:hover, .tact-dropdown-item:focus {
-  background: #00aaff22;
-  color: #00aaff;
+  background: #00aaff22 !important;
+  color: #00aaff !important;
 }
 .tact-dropdown-item.selected {
   background: #00aaff33;
@@ -181,4 +181,23 @@
   border: 1.5px solid #00aaff;
   box-shadow: 0 0 0 2px #00aaff33;
   outline: none;
-} 
+}
+
+/* Make address input wider and modern */
+.tact-dropdown + input[type="text"] {
+  width: 100%;
+  min-width: 220px;
+  max-width: 340px;
+  background: #23262f;
+  border-radius: 1rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 1.1rem;
+  border: none;
+  color: #fff;
+  margin-top: 0.5rem;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+.tact-dropdown + input[type="text"]:focus {
+  box-shadow: 0 0 0 2px #00aaff55;
+  border: 1.5px solid #00aaff;
+}

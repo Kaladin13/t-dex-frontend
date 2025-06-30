@@ -22,9 +22,7 @@ export default function TokenSelector({
   setJettonAddressStatus,
   setVaultAddress,
 }: Props) {
-  const [customAddress, setCustomAddress] = useState(
-    selected.type === 'jetton' ? selected.address : '',
-  )
+  const [customAddress, setCustomAddress] = useState('')
   const [mode, setMode] = useState(selected.type)
   const [open, setOpen] = useState(false)
   const [vaultAddress, setVaultAddressLocal] = useState<string | undefined>()
@@ -67,16 +65,20 @@ export default function TokenSelector({
     setMode(value)
     setOpen(false)
     if (value === 'ton') {
+      setCustomAddress('');
+      setHasTyped(false);
       const ton = tokens.find((t) => t.type === 'ton')
       if (ton) onSelect(ton)
-    } else if (customAddress) {
+    } else {
+      setCustomAddress('');
+      setHasTyped(false);
       onSelect({
         type: 'jetton',
         symbol: 'JETTON',
         name: 'Custom Jetton',
         logo: '',
         balance: 0n,
-        address: customAddress,
+        address: '',
         vaultAddress: '',
       })
     }
