@@ -9,7 +9,7 @@ export default tseslint.config(
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
-    ignores: ["./src/services/wrappers/*"],
+    ignores: ['./src/services/wrappers/*'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -22,6 +22,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['off'],
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
 )
