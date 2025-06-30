@@ -63,11 +63,12 @@ export default function Swap() {
   }
 
   const handleFromAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFromAmount(e.target.value)
-    setToAmount(e.target.value)
+    const val = e.target.value.replace(/,/, '.')
+    setFromAmount(val)
+    setToAmount(val)
 
     await onBalanceInput({
-      amount: e.target.value,
+      amount: val,
       tonConnectUI,
       network,
       fromToken,
@@ -77,8 +78,9 @@ export default function Swap() {
   }
 
   const handleToAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setToAmount(e.target.value)
-    setFromAmount(e.target.value)
+    const val = e.target.value.replace(/,/, '.')
+    setToAmount(val)
+    setFromAmount(val)
 
     // TODO: amountNeededToGetX
   }
@@ -87,11 +89,14 @@ export default function Swap() {
     if (!userAddress) return
 
     const balanceString = fromToken.type === 'ton' ? tonBalance : fromNano(fromToken.balance)
-    const balance = parseFloat(balanceString)
+    const balance = parseFloat(balanceString.replace(',', '.'))
     if (isNaN(balance)) return
 
     const amount = balance * fraction
-    const amountString = amount.toString()
+    const amountString = amount.toLocaleString('en-US', {
+      useGrouping: false,
+      maximumFractionDigits: 20,
+    })
     setFromAmount(amountString)
     // Also trigger the dependent updates
     handleFromAmountChange({ target: { value: amountString } } as React.ChangeEvent<HTMLInputElement>)
@@ -165,7 +170,8 @@ export default function Swap() {
           />
           <div className='input-wrapper'>
             <input
-              type='number'
+              type='text'
+              inputMode='decimal'
               value={fromAmount}
               onChange={handleFromAmountChange}
               placeholder='0'
@@ -213,7 +219,8 @@ export default function Swap() {
           />
           <div className='input-wrapper'>
             <input
-              type='number'
+              type='text'
+              inputMode='decimal'
               value={toAmount}
               onChange={handleToAmountChange}
               placeholder='0'
