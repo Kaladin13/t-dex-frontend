@@ -31,6 +31,7 @@ export default function TokenSelector({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [tonConnectUI] = useTonConnectUI()
   const { network } = useNetwork()
+  const [hasTyped, setHasTyped] = useState(false)
 
   // close dropdown on outside click
   useEffect(() => {
@@ -81,10 +82,13 @@ export default function TokenSelector({
     }
   }
 
-  const handleCustomAddressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const addr = e.target.value
-    setCustomAddress(addr)
+  const showPreview =
+    mode === 'ton' || (mode === 'jetton' && selected.type === 'jetton' && selected.address && selected.symbol && selected.logo && hasTyped);
 
+  const handleCustomAddressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const addr = e.target.value;
+    setCustomAddress(addr);
+    setHasTyped(true);
     onSelect({
       type: 'jetton',
       symbol: 'JETTON',
@@ -93,12 +97,10 @@ export default function TokenSelector({
       balance: 0n,
       address: addr,
       vaultAddress: '',
-    })
-
+    });
     if (setJettonAddressStatus) {
-      setJettonAddressStatus(undefined)
+      setJettonAddressStatus(undefined);
     }
-
     try {
       await onJettonAddressInput({
         address: addr,
@@ -106,14 +108,12 @@ export default function TokenSelector({
         network,
         setVaultAddress: setVaultAddress,
         onSelect,
-      })
-
-      if (setJettonAddressStatus) setJettonAddressStatus('success')
+      });
+      if (setJettonAddressStatus) setJettonAddressStatus('success');
     } catch (err) {
-      console.log(err)
-      if (setJettonAddressStatus) setJettonAddressStatus('error')
+      if (setJettonAddressStatus) setJettonAddressStatus('error');
     }
-  }
+  };
 
   const getLogoSrc = (token: Token) => {
     console.log(token.logo)
@@ -121,6 +121,10 @@ export default function TokenSelector({
     if (token.type === 'ton') return TonLogo
     return JettonLogo
   }
+
+  // Helper to truncate addresses
+  const truncateAddress = (addr: string) =>
+    addr.length > 12 ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : addr;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -149,14 +153,14 @@ export default function TokenSelector({
             justifyContent: 'space-between',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexGrow: 1 }}>
-            <img
-              src={getLogoSrc(selected)}
-              alt={`${selected.symbol} logo`}
-              style={{ width: 24, height: 24, borderRadius: '50%' }}
-            />
-            <span style={{ fontWeight: 'bold' }}>{selected.name}</span>
-          </div>
+          {showPreview ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexGrow: 1 }}>
+              <img src={getLogoSrc(selected)} alt={`${selected.symbol} logo`} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+              <span style={{ fontWeight: 'bold' }}>{selected.name}</span>
+            </div>
+          ) : (
+            <span style={{ color: '#888', fontWeight: 500 }}>Select or enter address</span>
+          )}
           <span style={{ marginLeft: 8, fontSize: 18, color: '#aaa' }}>▼</span>
         </button>
         {open && (
@@ -214,7 +218,9 @@ export default function TokenSelector({
             padding: '0.75rem',
             borderRadius: 12,
             border:
-              jettonAddressStatus === 'error'
+              !hasTyped
+                ? 'none'
+                : jettonAddressStatus === 'error'
                 ? '1.5px solid #f85149'
                 : jettonAddressStatus === 'success'
                 ? '1.5px solid #3fb950'
@@ -224,7 +230,9 @@ export default function TokenSelector({
             fontSize: '1.1rem',
             outline: 'none',
             boxShadow:
-              jettonAddressStatus === 'error'
+              !hasTyped
+                ? undefined
+                : jettonAddressStatus === 'error'
                 ? '0 0 0 2px #f8514933'
                 : jettonAddressStatus === 'success'
                 ? '0 0 0 2px #3fb95033'
