@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTonConnectUI } from '@tonconnect/ui-react'
+import { useTonConnectUI, useTonAddress, useTonConnectModal } from '@tonconnect/ui-react'
 import { useNetwork } from '../contexts/NetworkContext'
 import { onBalanceInput, Token } from '../services/dex'
 import TokenSelector from './TokenSelector'
@@ -29,6 +29,8 @@ export default function Swap() {
   const [swapping, setSwapping] = useState(false)
 
   const [tonConnectUI] = useTonConnectUI()
+  const userAddress = useTonAddress()
+  const { open } = useTonConnectModal()
   const { network } = useNetwork()
 
   const [jettonAddressStatusFrom, setJettonAddressStatusFrom] = useState<
@@ -106,7 +108,7 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>From</span>
-          <div className='balance'>Balance: {fromToken.balance.toString()}</div>
+          <div className='balance'>Balance: {userAddress ? fromToken.balance.toString() : '-'}</div>
         </div>
         <div className='token-input-row'>
           <TokenSelector
@@ -138,7 +140,7 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>To</span>
-          <div className='balance'>Balance: {toToken.balance.toString()}</div>
+          <div className='balance'>Balance: {userAddress ? toToken.balance.toString() : '-'}</div>
         </div>
         <div className='token-input-row'>
           <TokenSelector
@@ -167,13 +169,23 @@ export default function Swap() {
         </div>
         <div>Slippage: 0.5% (mock)</div>
       </div>
-      <button
-        className='swap-btn'
-        onClick={handleSwap}
-        disabled={swapping || !fromAmount || !toAmount}
-      >
-        {swapping ? 'Swapping...' : 'Swap'}
-      </button>
+
+      {!userAddress ? (
+        <button
+          className='swap-btn'
+          onClick={open}
+        >
+          Connect wallet
+        </button>
+      ) : (
+        <button
+          className='swap-btn'
+          onClick={handleSwap}
+          disabled={swapping || !fromAmount || !toAmount}
+        >
+          {swapping ? 'Swapping...' : 'Swap'}
+        </button>
+      )}
     </div>
   )
 }

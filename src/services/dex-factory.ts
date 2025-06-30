@@ -1,5 +1,8 @@
 import { Address, TonClient } from '@ton/ton'
 import { Factory } from './wrappers/DEX_Factory'
+import { TonVault } from './wrappers/DEX_TonVault'
+import { JettonVault } from './wrappers/DEX_JettonVault'
+import { AmmPool } from './wrappers/DEX_AmmPool'
 
 const DEX_FACTORY_ADDRESS = Address.parse('EQBJiBXaBqHEDO108PBuKxWGseG_tWxeFOwAGRiU4fRGyQmL')
 
@@ -31,11 +34,45 @@ export const getTonVault = async (ton: TonClient) => {
       throw new Error('TON Vault contract is not initialized')
     }
 
-    const tonVault = ton.open(Factory.fromAddress(TON_VAULT_ADDRESS))
+    const tonVault = ton.open(TonVault.fromAddress(TON_VAULT_ADDRESS))
     return tonVault
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     alert('Failed to get TON Vault address')
     throw new Error('Failed to get TON Vault address')
+  }
+}
+
+export const getJettonVaultFromAddress = async (ton: TonClient, jettonVaultAddress: Address) => {
+  try {
+    const vaultState = await ton.provider(jettonVaultAddress).getState()
+
+    if (vaultState.state.type === 'uninit') {
+      throw new Error('Jetton Vault contract is not initialized')
+    }
+
+    const jettonVault = ton.open(JettonVault.fromAddress(jettonVaultAddress))
+    return jettonVault
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    alert('Failed to get Jetton Vault address')
+    throw new Error('Failed to get Jetton Vault address')
+  }
+}
+
+export const getAmmPoolFromAddress = async (ton: TonClient, ammPoolAddress: Address) => {
+  try {
+    const ammState = await ton.provider(ammPoolAddress).getState()
+
+    if (ammState.state.type === 'uninit') {
+      throw new Error('Jetton Vault contract is not initialized')
+    }
+
+    const ammPool = ton.open(AmmPool.fromAddress(ammPoolAddress))
+    return ammPool
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    alert('Failed to get Jetton Vault address')
+    throw new Error('Failed to get Jetton Vault address')
   }
 }

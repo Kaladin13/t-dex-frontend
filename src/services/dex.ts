@@ -1,7 +1,12 @@
 import { TonConnectUI } from '@tonconnect/ui-react'
 import { Network } from '../components/NetworkSwitcher'
 import { getTonClient } from './client'
-import { getFactory } from './dex-factory'
+import {
+  getAmmPoolFromAddress,
+  getFactory,
+  getJettonVaultFromAddress,
+  getTonVault,
+} from './dex-factory'
 import { Address, TonClient } from '@ton/ton'
 import { JettonMinterFeatureRich } from './wrappers/FeatureRich_JettonMinterFeatureRich'
 import { JettonWalletFeatureRich } from './wrappers/FeatureRich_JettonWalletFeatureRich'
@@ -85,7 +90,22 @@ export async function onJettonAddressInput({
   })
 }
 
-const handleExactIn = async () => {}
+const getVaultFromToken = async (tonClient: TonClient, token: Token) => {
+  if (token.type === 'ton') {
+    return await getTonVault(tonClient)
+  }
+  if (token.type === 'jetton') {
+    return await getJettonVaultFromAddress(tonClient, Address.parse(token.vaultAddress))
+  }
+}
+
+declare global {
+    interface BigInt {
+        toJSON(): number;
+    }
+}
+
+BigInt.prototype.toJSON = function () { return Number(this) }
 
 export async function onBalanceInput({
   amount,
@@ -102,18 +122,41 @@ export async function onBalanceInput({
   toToken: Token
   swapType: 'exactIn' | 'exactOut'
 }): Promise<void> {
-  // Simulate async work
-  if (swapType === 'exactIn') {
+  const tonClient = getTonClient('testnet')
+  const factory = await getFactory(tonClient)
+
+  console.log(`token from: ${JSON.stringify(fromToken)}`);
+  console.log(`to from: ${JSON.stringify(toToken)}`);
+
+  const vaultFrom = await getVaultFromToken(tonClient, fromToken)
+  const vaultTo = await getVaultFromToken(tonClient, toToken)
+
+  if (!vaultFrom || !vaultTo) {
+    console.error('Failed to get pools for tokens')
+    return
   }
 
-  if (fromToken?.type === 'jetton') {
-    // Here you would typically call a function to handle the jetton balance input
-    console.log(
-      `Handling jetton balance input for ${fromToken.symbol} at address ${fromToken?.name}`,
-    )
+  const ammPoolAddress = await factory.getAmmPoolAddr({
+    $$type: 'AmmPoolParams',
+    firstVault: vaultFrom.address,
+    secondVault: vaultTo.address,
+  })
+
+  const ammPool = await getAmmPoolFromAddress(tonClient, ammPoolAddress)
+
+  if (swapType === 'exactIn') {
+    const amountIn = BigInt(amount)
+    const amountOut = await ammPool.getExpectedOut(vaultFrom.address, BigInt(amountIn))
+
+    console.log(`Estimated output amount: ${amountOut}`)
+    // set toAmount(amountOut.toString())
   }
-  if (fromToken?.type === 'ton') {
-    // Here you would typically call a function to handle the TON balance input
-    console.log(`Handling TON balance input for ${fromToken.symbol}`)
+
+  if (swapType === 'exactOut') {
+    const amountOut = BigInt(amount)
+    const amountIn = await ammPool.getNeededInToGetX(vaultTo.address, BigInt(amountOut))
+
+    console.log(`Estimated input amount: ${amountIn}`)
+    // set fromAmount(amountIn.toString())
   }
 }
