@@ -80,7 +80,7 @@ export async function onJettonAddressInput({
     )
 
     const userJettonData = await userJettonWallet.getGetWalletData()
-    userBalance = BigInt(fromNano(userJettonData.balance))
+    userBalance = userJettonData.balance
   }
 
   // TODO: get actual jetton info here
@@ -153,19 +153,18 @@ export async function onBalanceInput({
   const ammPool = await getAmmPoolFromAddress(tonClient, ammPoolAddress)
 
   if (swapType === 'exactIn') {
-    const amountIn = BigInt(amount)
-    const amountOut = await ammPool.getExpectedOut(vaultFrom.address, BigInt(amountIn))
+    // const amountIn = BigInt(amount)
+    const amountOut = await ammPool.getExpectedOut(vaultFrom.address, toNano(amount))
 
     console.log(`Estimated output amount: ${amountOut}`)
-    if (setToAmount) setToAmount(amountOut.toString())
+    if (setToAmount) setToAmount(fromNano(amountOut))
   }
 
   if (swapType === 'exactOut') {
-    const amountOut = BigInt(amount)
-    const amountIn = await ammPool.getNeededInToGetX(vaultTo.address, BigInt(amountOut))
+    const amountIn = await ammPool.getNeededInToGetX(vaultTo.address, toNano(amount))
 
     console.log(`Estimated input amount: ${amountIn}`)
-    if (setFromAmount) setFromAmount(amountIn.toString())
+    if (setFromAmount) setFromAmount(fromNano(amountIn))
   }
 }
 
@@ -213,7 +212,7 @@ export async function handleFromSwapAction(
 
   const ammPool = await getAmmPoolFromAddress(tonClient, ammPoolAddress)
 
-  const amountIn = BigInt(amount)
+  const amountIn = toNano(amount)
 
   if (fromToken.type === 'ton') {
     return
@@ -236,7 +235,7 @@ export async function handleFromSwapAction(
   )
 
   const userJettonData = await userJettonWallet.getGetWalletData()
-  userBalance = BigInt(fromNano(userJettonData.balance))
+  userBalance = userJettonData.balance
   // check balance if more
 
   const amountOut = await ammPool.getExpectedOut(vaultFrom.address, amountIn)

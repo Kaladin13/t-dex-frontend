@@ -63,7 +63,15 @@ export default function Swap() {
   }
 
   const handleFromAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/,/, '.')
+    const inputValue = e.target.value
+    
+    // Разрешаем только цифры, точку и запятую
+    const numericRegex = /^[0-9]*[.,]?[0-9]*$/
+    if (inputValue !== '' && !numericRegex.test(inputValue)) {
+      return // Не обновляем состояние если ввод некорректный
+    }
+    
+    const val = inputValue.replace(/,/, '.')
     setFromAmount(val)
     // setToAmount(val)
 
@@ -79,7 +87,15 @@ export default function Swap() {
   }
 
   const handleToAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/,/, '.')
+    const inputValue = e.target.value
+    
+    // Разрешаем только цифры, точку и запятую
+    const numericRegex = /^[0-9]*[.,]?[0-9]*$/
+    if (inputValue !== '' && !numericRegex.test(inputValue)) {
+      return // Не обновляем состояние если ввод некорректный
+    }
+    
+    const val = inputValue.replace(/,/, '.')
     setToAmount(val)
     // setFromAmount(val)
 
