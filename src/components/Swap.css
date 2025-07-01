@@ -1,5 +1,5 @@
 .swap-card {
-  max-width: 480px;
+  max-width: 560px;
   margin: 40px auto;
   padding: 2rem;
   background: #181a20;
@@ -31,13 +31,13 @@
 
 .token-input-row {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 1.5rem;
 }
 
 .token-input-row .tact-dropdown {
   flex-shrink: 0;
-  width: 150px;
+  width: 180px;
 }
 
 .input-wrapper {
@@ -45,6 +45,10 @@
   text-align: right;
   display: flex;
   flex-direction: column;
+}
+
+.input-wrapper .amount-input {
+  margin-top: 0;
 }
 
 .amount-input {
@@ -55,8 +59,10 @@
   font-weight: 500;
   width: 100%;
   text-align: right;
-  padding: 0;
+  padding: 0.75rem 0;
   outline: none;
+  height: 3.5rem;
+  box-sizing: border-box;
 }
 
 .amount-input::placeholder {
@@ -68,7 +74,7 @@
 .amount-setter {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
@@ -77,11 +83,12 @@
   color: #00aaff;
   border: 1px solid #00aaff33;
   border-radius: 8px;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  min-width: 60px;
 }
 
 .amount-button:hover:not(:disabled) {
@@ -157,6 +164,8 @@
   justify-content: space-between;
   transition: background 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(0,170,255,0.04);
+  height: 3.5rem;
+  box-sizing: border-box;
 }
 .tact-dropdown-btn:focus, .tact-dropdown-btn:hover {
   background: #1a2233;
@@ -211,21 +220,21 @@
   outline: none;
 }
 
-/* Make address input wider and modern */
+/* Make address input same size as dropdown */
 .tact-dropdown + input[type="text"] {
-  width: 100%;
-  min-width: 220px;
-  max-width: 340px;
+  width: 180px;
   background: #23262f;
-  border-radius: 1rem;
-  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  padding: 0.75rem;
   font-size: 1.1rem;
   border: none;
   color: #fff;
   margin-top: 0.5rem;
   transition: box-shadow 0.2s, border 0.2s;
+  box-shadow: 0 2px 8px rgba(0,170,255,0.04);
 }
 .tact-dropdown + input[type="text"]:focus {
-  box-shadow: 0 0 0 2px #00aaff55;
+  box-shadow: 0 4px 16px rgba(0,170,255,0.10);
   border: 1.5px solid #00aaff;
+  background: #1a2233;
 }
