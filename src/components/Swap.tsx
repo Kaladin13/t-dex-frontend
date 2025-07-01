@@ -253,6 +253,23 @@ export default function Swap() {
     return balance.toFixed(balance > 0 && balance < 0.0001 ? 8 : 4)
   }
 
+  const getTonViewerLink = (token: Token) => {
+    if (token.type === 'ton') {
+      // Для TON используем адрес TON Vault
+      return `https://testnet.tonviewer.com/EQDTsG5OoAbrtTRpYMHlmqDXwI9mj3Iv-wj-NNrNf0BDG-zD`
+    } else if (token.type === 'jetton' && token.address) {
+      return `https://testnet.tonviewer.com/${token.address}`
+    }
+    return null
+  }
+
+  const openTonViewer = (token: Token) => {
+    const link = getTonViewerLink(token)
+    if (link) {
+      window.open(link, '_blank')
+    }
+  }
+
   const isAmountSelectorDisabled =
     !userAddress || (fromToken.type === 'jetton' && jettonAddressStatusFrom !== 'success')
 
@@ -322,17 +339,40 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>From</span>
-          <div className='balance'>Balance: {formatBalanceForDisplay(fromToken)}</div>
+          <div className='balance'>
+            Balance: {formatBalanceForDisplay(fromToken)}
+            {(fromToken.type === 'ton' || (fromToken.type === 'jetton' && vaultAddressFrom)) && (
+              <button
+                onClick={() => openTonViewer(fromToken)}
+                style={{
+                  marginLeft: '8px',
+                  padding: '2px 6px',
+                  fontSize: '12px',
+                  background: 'none',
+                  border: '1px solid #007bff',
+                  borderRadius: '4px',
+                  color: '#007bff',
+                  cursor: 'pointer',
+                  textDecoration: 'none'
+                }}
+                title="Открыть в TonViewer"
+              >
+                🔗
+              </button>
+            )}
+          </div>
         </div>
         <div className='token-input-row'>
-          <TokenSelector
-            tokens={mockTokens}
-            selected={fromToken}
-            onSelect={handleFromTokenSelect}
-            jettonAddressStatus={jettonAddressStatusFrom}
-            setJettonAddressStatus={setJettonAddressStatusFrom}
-            setVaultAddress={setVaultAddressFrom}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <TokenSelector
+              tokens={mockTokens}
+              selected={fromToken}
+              onSelect={handleFromTokenSelect}
+              jettonAddressStatus={jettonAddressStatusFrom}
+              setJettonAddressStatus={setJettonAddressStatusFrom}
+              setVaultAddress={setVaultAddressFrom}
+            />
+          </div>
           <div className='input-wrapper'>
             <input
               type='text'
@@ -371,17 +411,40 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>To</span>
-          <div className='balance'>Balance: {toToken ? formatBalanceForDisplay(toToken) : '-'}</div>
+          <div className='balance'>
+            Balance: {toToken ? formatBalanceForDisplay(toToken) : '-'}
+            {toToken && (toToken.type === 'ton' || (toToken.type === 'jetton' && vaultAddressTo)) && (
+              <button
+                onClick={() => openTonViewer(toToken)}
+                style={{
+                  marginLeft: '8px',
+                  padding: '2px 6px',
+                  fontSize: '12px',
+                  background: 'none',
+                  border: '1px solid #007bff',
+                  borderRadius: '4px',
+                  color: '#007bff',
+                  cursor: 'pointer',
+                  textDecoration: 'none'
+                }}
+                title="Открыть в TonViewer"
+              >
+                🔗
+              </button>
+            )}
+          </div>
         </div>
         <div className='token-input-row'>
-          <TokenSelector
-            tokens={mockTokens}
-            selected={toToken}
-            onSelect={handleToTokenSelect}
-            jettonAddressStatus={jettonAddressStatusTo}
-            setJettonAddressStatus={setJettonAddressStatusTo}
-            setVaultAddress={setVaultAddressTo}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <TokenSelector
+              tokens={mockTokens}
+              selected={toToken}
+              onSelect={handleToTokenSelect}
+              jettonAddressStatus={jettonAddressStatusTo}
+              setJettonAddressStatus={setJettonAddressStatusTo}
+              setVaultAddress={setVaultAddressTo}
+            />
+          </div>
           <div className='input-wrapper'>
             <input
               type='text'
