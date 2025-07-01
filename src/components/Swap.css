@@ -1,14 +1,14 @@
 .swap-card {
   max-width: 560px;
-  margin: 40px auto;
-  padding: 2rem;
+  margin: 20px auto;
+  padding: 1.5rem;
   background: #181a20;
   border-radius: 1.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.2);
   color: #fff;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .swap-section {
@@ -16,7 +16,7 @@
   flex-direction: column;
   gap: 0.5rem;
   background: #181a20;
-  padding: 1rem;
+  padding: 0.75rem;
   border-radius: 1rem;
 }
 
@@ -55,13 +55,13 @@
   background: none;
   border: none;
   color: #fff;
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 500;
   width: 100%;
   text-align: right;
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   outline: none;
-  height: 3.5rem;
+  height: 3rem;
   box-sizing: border-box;
 }
 
@@ -107,21 +107,21 @@
   background: #23262f;
   border: none;
   border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
-  font-size: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.25rem;
   color: #fff;
   cursor: pointer;
-  margin: 0.5rem 0;
+  margin: 0.25rem 0;
 }
 
 .swap-btn {
-  padding: 1rem;
+  padding: 0.75rem;
   border-radius: 1rem;
   background: #00aaff;
   color: #fff;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.2s;
@@ -155,8 +155,8 @@
   color: #fff;
   border: none;
   border-radius: 12px;
-  padding: 0.75rem;
-  font-size: 1.1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
   text-align: left;
   cursor: pointer;
   display: flex;
@@ -164,7 +164,7 @@
   justify-content: space-between;
   transition: background 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(0,170,255,0.04);
-  height: 3.5rem;
+  height: 3rem;
   box-sizing: border-box;
 }
 .tact-dropdown-btn:focus, .tact-dropdown-btn:hover {
