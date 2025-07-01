@@ -73,7 +73,7 @@ export const getAmmPoolFromAddress = async (ton: TonClient, ammPoolAddress: Addr
     return ammPool
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
-    toast.error('Failed to get Amm Pool')
+    toast.error('Amm Pool for this pair of assets is not initialized')
     throw new Error('Failed to get Jetton Vault address')
   }
 }

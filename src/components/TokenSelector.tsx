@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 
 type Props = {
   tokens: Token[]
-  selected: Token
+  selected: Token | undefined
   onSelect: (token: Token) => void
   jettonAddressStatus?: 'error' | 'success'
   setJettonAddressStatus?: (status: 'error' | 'success' | undefined) => void
@@ -24,7 +24,7 @@ export default function TokenSelector({
   setVaultAddress,
 }: Props) {
   const [customAddress, setCustomAddress] = useState('')
-  const [mode, setMode] = useState(selected.type)
+  const [mode, setMode] = useState(selected?.type || 'ton')
   const [open, setOpen] = useState(false)
   const [vaultAddress, setVaultAddressLocal] = useState<string | undefined>()
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -86,7 +86,7 @@ export default function TokenSelector({
   }
 
   const showPreview =
-    mode === 'ton' || (mode === 'jetton' && selected.type === 'jetton' && selected.address && selected.symbol && selected.logo && hasTyped);
+    mode === 'ton' || (mode === 'jetton' && selected && selected.type === 'jetton' && selected.address && selected.symbol && selected.logo && hasTyped);
 
   const handleCustomAddressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const addr = e.target.value;
@@ -157,7 +157,7 @@ export default function TokenSelector({
             justifyContent: 'space-between',
           }}
         >
-          {showPreview ? (
+          {showPreview && selected ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexGrow: 1 }}>
               <img src={getLogoSrc(selected)} alt={`${selected.symbol} logo`} style={{ width: 24, height: 24, borderRadius: '50%' }} />
               <span style={{ fontWeight: 'bold' }}>{selected.name}</span>

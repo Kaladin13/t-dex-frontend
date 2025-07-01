@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useTonConnectUI, useTonAddress, useTonConnectModal } from '@tonconnect/ui-react'
 import { useNetwork } from '../contexts/NetworkContext'
-import { onBalanceInput, Token, fetchTonBalance, handleFromSwapAction } from '../services/dex'
+import {
+  onBalanceInput,
+  Token,
+  fetchTonBalance,
+  handleFromSwapAction,
+  getExchangeRate,
+} from '../services/dex'
 import TokenSelector from './TokenSelector'
 import './Swap.css'
 import TonLogo from '../assets/ton-logo.svg'
@@ -24,10 +30,11 @@ const mockTokens: Token[] = [
 
 export default function Swap() {
   const [fromToken, setFromToken] = useState<Token>(mockTokens[0]!)
-  const [toToken, setToToken] = useState<Token>(mockTokens[1]!)
+  const [toToken, setToToken] = useState<Token | undefined>(undefined)
   const [fromAmount, setFromAmount] = useState('')
   const [toAmount, setToAmount] = useState('')
   const [swapping, setSwapping] = useState(false)
+  const [exchangeRates, setExchangeRates] = useState({ directRate: '1', reverseRate: '1' })
 
   const [tonConnectUI] = useTonConnectUI()
   const userAddress = useTonAddress()
@@ -46,12 +53,41 @@ export default function Swap() {
 
   useEffect(() => {
     if (!userAddress || !tonConnectUI) return
-    if (fromToken.type === 'ton' || toToken.type === 'ton') {
+    if (fromToken.type === 'ton' || (toToken && toToken.type === 'ton')) {
       fetchTonBalance({ tonConnectUI, network, setBalance: setTonBalance })
     }
   }, [userAddress, tonConnectUI, fromToken, toToken, network])
 
+  useEffect(() => {
+    if (!tonConnectUI || !toToken) return
+
+    const isFromTokenValid =
+      fromToken.type === 'ton' ||
+      (fromToken.type === 'jetton' && fromToken.address && fromToken.address.trim() !== '')
+    const isToTokenValid =
+      toToken.type === 'ton' ||
+      (toToken.type === 'jetton' && toToken.address && toToken.address.trim() !== '')
+
+    if (!isFromTokenValid || !isToTokenValid) {
+      setExchangeRates({ directRate: '1', reverseRate: '1' })
+      return
+    }
+
+    const updateExchangeRate = async () => {
+      const rates = await getExchangeRate({
+        tonConnectUI,
+        network,
+        fromToken,
+        toToken,
+      })
+      setExchangeRates(rates)
+    }
+
+    updateExchangeRate()
+  }, [fromToken, toToken, tonConnectUI, network])
+
   const handleSwapDirection = () => {
+    if (!toToken) return
     setFromToken(toToken)
     setToToken(fromToken)
     setFromAmount(toAmount)
@@ -64,50 +100,54 @@ export default function Swap() {
 
   const handleFromAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
-    
+
     // Разрешаем только цифры, точку и запятую
     const numericRegex = /^[0-9]*[.,]?[0-9]*$/
     if (inputValue !== '' && !numericRegex.test(inputValue)) {
       return // Не обновляем состояние если ввод некорректный
     }
-    
+
     const val = inputValue.replace(/,/, '.')
     setFromAmount(val)
     // setToAmount(val)
 
-    await onBalanceInput({
-      amount: val,
-      tonConnectUI,
-      network,
-      fromToken,
-      toToken,
-      swapType: 'exactIn',
-      setToAmount,
-    })
+    if (toToken) {
+      await onBalanceInput({
+        amount: val,
+        tonConnectUI,
+        network,
+        fromToken,
+        toToken,
+        swapType: 'exactIn',
+        setToAmount,
+      })
+    }
   }
 
   const handleToAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
-    
+
     // Разрешаем только цифры, точку и запятую
     const numericRegex = /^[0-9]*[.,]?[0-9]*$/
     if (inputValue !== '' && !numericRegex.test(inputValue)) {
       return // Не обновляем состояние если ввод некорректный
     }
-    
+
     const val = inputValue.replace(/,/, '.')
     setToAmount(val)
     // setFromAmount(val)
 
-    await onBalanceInput({
-      amount: val,
-      tonConnectUI,
-      network,
-      fromToken,
-      toToken,
-      swapType: 'exactOut',
-      setFromAmount,
-    })
+    if (toToken) {
+      await onBalanceInput({
+        amount: val,
+        tonConnectUI,
+        network,
+        fromToken,
+        toToken,
+        swapType: 'exactOut',
+        setFromAmount,
+      })
+    }
   }
 
   const setAmountFromBalance = (fraction: number) => {
@@ -156,6 +196,7 @@ export default function Swap() {
   }
 
   const handleSwap = () => {
+    if (!toToken) return
     setSwapping(true)
     handleFromSwapAction(tonConnectUI, fromToken, toToken, fromAmount)
     setTimeout(() => setSwapping(false), 40000)
@@ -178,6 +219,8 @@ export default function Swap() {
 
   const isAmountSelectorDisabled =
     !userAddress || (fromToken.type === 'jetton' && jettonAddressStatusFrom !== 'success')
+
+  const { directRate, reverseRate } = exchangeRates
 
   return (
     <div className='swap-card'>
@@ -234,7 +277,7 @@ export default function Swap() {
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>To</span>
-          <div className='balance'>Balance: {formatBalanceForDisplay(toToken)}</div>
+          <div className='balance'>Balance: {toToken ? formatBalanceForDisplay(toToken) : '-'}</div>
         </div>
         <div className='token-input-row'>
           <TokenSelector
@@ -259,9 +302,18 @@ export default function Swap() {
         </div>
       </div>
       <div className='swap-info'>
-        <div>
-          Price: 1 {fromToken.symbol} = 1 {toToken.symbol}
-        </div>
+        {toToken ? (
+          <>
+            <div>
+              Price: 1 {fromToken.symbol} = {directRate} {toToken.symbol}
+            </div>
+            <div>
+              1 {toToken.symbol} = {reverseRate} {fromToken.symbol}
+            </div>
+          </>
+        ) : (
+          <div>Select a token to see exchange rate</div>
+        )}
         <div>Slippage: 0.5% (mock)</div>
       </div>
 
@@ -276,7 +328,7 @@ export default function Swap() {
         <button
           className='swap-btn'
           onClick={handleSwap}
-          disabled={swapping || !fromAmount || !toAmount}
+          disabled={swapping || !fromAmount || !toAmount || !toToken}
         >
           {swapping ? 'Swapping...' : 'Swap'}
         </button>

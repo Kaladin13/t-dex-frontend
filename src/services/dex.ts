@@ -168,6 +168,62 @@ export async function onBalanceInput({
   }
 }
 
+export async function getExchangeRate({
+  tonConnectUI,
+  network,
+  fromToken,
+  toToken,
+}: {
+  tonConnectUI: TonConnectUI
+  network: Network
+  fromToken: Token
+  toToken: Token
+}): Promise<{ directRate: string; reverseRate: string }> {
+  try {
+    const isFromTokenValid =
+      fromToken.type === 'ton' ||
+      (fromToken.type === 'jetton' &&
+        fromToken.vaultAddress !== '' &&
+        fromToken.address.trim() !== '')
+    const isToTokenValid =
+      toToken.type === 'ton' ||
+      (toToken.type === 'jetton' && toToken.vaultAddress !== '' && toToken.address.trim() !== '')
+    console.log(fromToken, toToken)
+
+    if (!isFromTokenValid || !isToTokenValid) {
+      return { directRate: '1', reverseRate: '1' }
+    }
+    const tonClient = getTonClient('testnet')
+    const factory = await getFactory(tonClient)
+
+    const vaultFrom = await getVaultFromToken(tonClient, fromToken)
+    const vaultTo = await getVaultFromToken(tonClient, toToken)
+
+    if (!vaultFrom || !vaultTo) {
+      return { directRate: '1', reverseRate: '1' }
+    }
+
+    const ammPoolAddress = await factory.getAmmPoolAddr(vaultFrom.address, vaultTo.address)
+    const ammPool = await getAmmPoolFromAddress(tonClient, ammPoolAddress)
+
+    const oneUnit = toNano('1')
+
+    const amountOut = await ammPool.getExpectedOut(vaultFrom.address, oneUnit)
+    const directRate = fromNano(amountOut)
+
+    const amountIn = await ammPool.getNeededInToGetX(vaultTo.address, oneUnit)
+    const reverseRate = fromNano(amountIn)
+
+    return {
+      directRate: parseFloat(directRate).toString(),
+      reverseRate: parseFloat(reverseRate).toString(),
+    }
+  } catch (e) {
+    console.error('Error getting exchange rate:', e)
+    return { directRate: '1', reverseRate: '1' }
+  }
+}
+
 export async function fetchTonBalance({
   tonConnectUI,
   network,
