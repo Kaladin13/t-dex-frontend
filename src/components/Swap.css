@@ -105,14 +105,46 @@
 .swap-direction {
   align-self: center;
   background: #23262f;
-  border: none;
+  border: 1px solid #00aaff33;
   border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   font-size: 1.25rem;
-  color: #fff;
+  color: #00aaff;
   cursor: pointer;
   margin: 0.25rem 0;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,170,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swap-direction:hover {
+  background: #00aaff22;
+  border-color: #00aaff;
+  box-shadow: 0 4px 16px rgba(0,170,255,0.15);
+}
+
+.swap-direction:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+.swap-direction.rotating {
+  animation: rotateSwap 0.4s ease-in-out;
+}
+
+@keyframes rotateSwap {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg) scale(1.1);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
 }
 
 .swap-btn {

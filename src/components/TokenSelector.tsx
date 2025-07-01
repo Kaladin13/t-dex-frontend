@@ -32,6 +32,20 @@ export default function TokenSelector({
   const { network } = useNetwork()
   const [hasTyped, setHasTyped] = useState(false)
 
+  // Синхронизируем mode с selected токеном
+  useEffect(() => {
+    if (selected?.type) {
+      setMode(selected.type)
+      if (selected.type === 'jetton') {
+        setCustomAddress(selected.address || '')
+        setHasTyped(!!selected.address)
+      } else if (selected.type === 'ton') {
+        setCustomAddress('')
+        setHasTyped(false)
+      }
+    }
+  }, [selected])
+
   // close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
