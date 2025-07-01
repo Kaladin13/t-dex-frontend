@@ -330,3 +330,88 @@ export async function handleFromSwapAction(
 
   await waitForSeqno(userAddress, tonClient)
 }
+
+export async function handleToSwapAction(
+  tonConnectUI: TonConnectUI,
+  fromToken: Token,
+  toToken: Token,
+  amount: string,
+  slippage: number = 0.5,
+) {
+  const tonClient = getTonClient('testnet')
+  const factory = await getFactory(tonClient)
+
+  console.log(`token from: ${JSON.stringify(fromToken)}`)
+  console.log(`to from: ${JSON.stringify(toToken)}`)
+
+  const vaultFrom = await getVaultFromToken(tonClient, fromToken)
+  const vaultTo = await getVaultFromToken(tonClient, toToken)
+
+  if (!vaultFrom || !vaultTo) {
+    console.error('Failed to get pools for tokens')
+    return
+  }
+
+  const ammPoolAddress = await factory.getAmmPoolAddr(vaultFrom.address, vaultTo.address)
+
+  const ammPool = await getAmmPoolFromAddress(tonClient, ammPoolAddress)
+
+  const amountOut = toNano(amount)
+
+  if (fromToken.type === 'ton') {
+    return
+  }
+
+  const jettonMaster = tonClient.open(JettonMinter.fromAddress(Address.parse(fromToken.address)))
+  const data = await jettonMaster.getGetJettonData()
+
+  const userWalletAddress = tonConnectUI.account?.address
+  let userBalance = 0n
+
+  if (typeof userWalletAddress === 'undefined') {
+    return
+  }
+  const userAddress = Address.parse(userWalletAddress)
+  const userJettonWalletAddress = await jettonMaster.getGetWalletAddress(userAddress)
+
+  const userJettonWallet = tonClient.open(
+    JettonWalletFeatureRich.fromAddress(userJettonWalletAddress),
+  )
+
+  const userJettonData = await userJettonWallet.getGetWalletData()
+  userBalance = userJettonData.balance
+  // check balance if more
+
+  const amountIn = await ammPool.getNeededInToGetX(vaultTo.address, amountOut)
+
+  // Apply slippage tolerance to maximum amount in
+  const maxAmountIn = (amountIn * BigInt(Math.floor((100 + slippage) * 100))) / 10000n
+  const swapPayloadCell = createJettonVaultSwapRequest(ammPool.address, true, amountOut)
+  const transferMsg = beginCell()
+    .store(
+      storeJettonTransfer({
+        $$type: 'JettonTransfer',
+        amount: maxAmountIn,
+        customPayload: null,
+        destination: vaultFrom.address,
+        forwardPayload: swapPayloadCell.beginParse(),
+        responseDestination: userAddress,
+        forwardTonAmount: toNano(0.5),
+        queryId: 0n,
+      }),
+    )
+    .endCell()
+
+  await tonConnectUI.sendTransaction({
+    messages: [
+      {
+        payload: transferMsg.toBoc().toString('base64'),
+        address: userJettonWallet.address.toString(),
+        amount: toNano(1).toString(),
+      },
+    ],
+    validUntil: Date.now() + 5 * 60 * 1000, // 5 minutes
+  })
+
+  await waitForSeqno(userAddress, tonClient)
+}

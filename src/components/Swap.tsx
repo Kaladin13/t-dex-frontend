@@ -6,6 +6,7 @@ import {
   Token,
   fetchTonBalance,
   handleFromSwapAction,
+  handleToSwapAction,
   getExchangeRate,
   onJettonAddressInput,
 } from '../services/dex'
@@ -239,7 +240,15 @@ export default function Swap() {
   const handleSwap = () => {
     if (!toToken) return
     setSwapping(true)
-    handleFromSwapAction(tonConnectUI, fromToken, toToken, fromAmount, slippage)
+    
+    if (lastChangedField === 'to') {
+      // Если последним редактировалось поле "To", используем exactOut swap
+      handleToSwapAction(tonConnectUI, fromToken, toToken, toAmount, slippage)
+    } else {
+      // Если последним редактировалось поле "From" или не определено, используем exactIn swap
+      handleFromSwapAction(tonConnectUI, fromToken, toToken, fromAmount, slippage)
+    }
+    
     setTimeout(() => setSwapping(false), 40000)
   }
 
