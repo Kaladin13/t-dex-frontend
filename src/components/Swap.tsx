@@ -94,7 +94,7 @@ export default function Swap() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedFromAmount(fromAmount)
-    }, 300)
+    }, 150)
 
     return () => clearTimeout(timer)
   }, [fromAmount])
@@ -103,7 +103,7 @@ export default function Swap() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedToAmount(toAmount)
-    }, 300)
+    }, 150)
 
     return () => clearTimeout(timer)
   }, [toAmount])
@@ -264,7 +264,7 @@ export default function Swap() {
       setFromAmount('')
       setToAmount('')
       setLastChangedField(null)
-      
+
       // Загружаем первый токен
       await onJettonAddressInput({
         address: 'kQBCzXhQNxS727KxwsHld8aVNoFpSka0Xzr3GUBOxC_l2gQM',
@@ -273,7 +273,7 @@ export default function Swap() {
         setVaultAddress: setVaultAddressFrom,
         onSelect: handleFromTokenSelect,
       })
-      
+
       // Загружаем второй токен
       await onJettonAddressInput({
         address: 'kQDO8Rt30nYL8RbXOWWMCqY3E4o-mN-tum0MTlABiFTDtz2p',
@@ -282,7 +282,7 @@ export default function Swap() {
         setVaultAddress: setVaultAddressTo,
         onSelect: handleToTokenSelect,
       })
-      
+
       setJettonAddressStatusFrom('success')
       setJettonAddressStatusTo('success')
     } catch (error) {
@@ -294,7 +294,14 @@ export default function Swap() {
 
   return (
     <div className='swap-card'>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+        }}
+      >
         <h2>Swap</h2>
         <button
           onClick={handleQuickTest}
@@ -306,7 +313,7 @@ export default function Swap() {
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '0.9rem',
-            fontWeight: '500'
+            fontWeight: '500',
           }}
         >
           Quick Test
