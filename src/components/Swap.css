@@ -63,11 +63,7 @@
   color: #555;
 }
 
-.amount-usd {
-  font-size: 1rem;
-  color: #aaa;
-  margin-top: 0.25rem;
-}
+
 
 .amount-setter {
   display: flex;

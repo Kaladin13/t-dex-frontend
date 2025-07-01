@@ -54,6 +54,9 @@ export default function Swap() {
   const [vaultAddressFrom, setVaultAddressFrom] = useState<string | undefined>()
   const [vaultAddressTo, setVaultAddressTo] = useState<string | undefined>()
   const [tonBalance, setTonBalance] = useState<string>('0')
+  const [slippage, setSlippage] = useState<number>(0.5)
+  const [customSlippage, setCustomSlippage] = useState<string>('')
+  const [isCustomSlippage, setIsCustomSlippage] = useState<boolean>(false)
 
   useEffect(() => {
     if (!userAddress || !tonConnectUI) return
@@ -121,6 +124,7 @@ export default function Swap() {
         toToken,
         swapType: 'exactIn',
         setToAmount,
+        slippage,
       })
     }
 
@@ -140,6 +144,7 @@ export default function Swap() {
         toToken,
         swapType: 'exactOut',
         setFromAmount,
+        slippage,
       })
     }
 
@@ -234,7 +239,7 @@ export default function Swap() {
   const handleSwap = () => {
     if (!toToken) return
     setSwapping(true)
-    handleFromSwapAction(tonConnectUI, fromToken, toToken, fromAmount)
+    handleFromSwapAction(tonConnectUI, fromToken, toToken, fromAmount, slippage)
     setTimeout(() => setSwapping(false), 40000)
   }
 
@@ -251,6 +256,22 @@ export default function Swap() {
     if (isNaN(balance)) return '0.0000'
     // show more precision for small balances
     return balance.toFixed(balance > 0 && balance < 0.0001 ? 8 : 4)
+  }
+
+  const calculateMinAmountWithSlippage = (amount: string, slippagePercent: number) => {
+    if (!amount || amount === '0' || amount === '') return '0'
+    const numAmount = parseFloat(amount)
+    if (isNaN(numAmount)) return '0'
+    const minAmount = numAmount * (1 - slippagePercent / 100)
+    return minAmount.toFixed(minAmount > 0 && minAmount < 0.0001 ? 8 : 4)
+  }
+
+  const calculateMaxAmountWithSlippage = (amount: string, slippagePercent: number) => {
+    if (!amount || amount === '0' || amount === '') return '0'
+    const numAmount = parseFloat(amount)
+    if (isNaN(numAmount)) return '0'
+    const maxAmount = numAmount * (1 + slippagePercent / 100)
+    return maxAmount.toFixed(maxAmount > 0 && maxAmount < 0.0001 ? 8 : 4)
   }
 
   const getTonViewerLink = (token: Token) => {
@@ -353,9 +374,9 @@ export default function Swap() {
                   borderRadius: '4px',
                   color: '#007bff',
                   cursor: 'pointer',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
                 }}
-                title="Открыть в TonViewer"
+                title='Открыть в TonViewer'
               >
                 🔗
               </button>
@@ -398,7 +419,13 @@ export default function Swap() {
                 Max
               </button>
             </div>
-            <div className='amount-usd'>$0.00</div>
+
+            {lastChangedField === 'to' && toAmount && toToken && (
+              <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>
+                Max amount to pay: {calculateMaxAmountWithSlippage(fromAmount, slippage)}{' '}
+                {fromToken.symbol}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -413,25 +440,26 @@ export default function Swap() {
           <span>To</span>
           <div className='balance'>
             Balance: {toToken ? formatBalanceForDisplay(toToken) : '-'}
-            {toToken && (toToken.type === 'ton' || (toToken.type === 'jetton' && vaultAddressTo)) && (
-              <button
-                onClick={() => openTonViewer(toToken)}
-                style={{
-                  marginLeft: '8px',
-                  padding: '2px 6px',
-                  fontSize: '12px',
-                  background: 'none',
-                  border: '1px solid #007bff',
-                  borderRadius: '4px',
-                  color: '#007bff',
-                  cursor: 'pointer',
-                  textDecoration: 'none'
-                }}
-                title="Открыть в TonViewer"
-              >
-                🔗
-              </button>
-            )}
+            {toToken &&
+              (toToken.type === 'ton' || (toToken.type === 'jetton' && vaultAddressTo)) && (
+                <button
+                  onClick={() => openTonViewer(toToken)}
+                  style={{
+                    marginLeft: '8px',
+                    padding: '2px 6px',
+                    fontSize: '12px',
+                    background: 'none',
+                    border: '1px solid #007bff',
+                    borderRadius: '4px',
+                    color: '#007bff',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                  }}
+                  title='Открыть в TonViewer'
+                >
+                  🔗
+                </button>
+              )}
           </div>
         </div>
         <div className='token-input-row'>
@@ -454,7 +482,13 @@ export default function Swap() {
               placeholder='0'
               className='amount-input'
             />
-            <div className='amount-usd'>$0.00</div>
+
+            {lastChangedField === 'from' && toAmount && toToken && (
+              <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>
+                Min amount to receive: {calculateMinAmountWithSlippage(toAmount, slippage)}{' '}
+                {toToken.symbol}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -471,7 +505,64 @@ export default function Swap() {
         ) : (
           <div>Select a token to see exchange rate</div>
         )}
-        <div>Slippage: 0.5% (mock)</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span>Max Slippage:</span>
+          <div style={{ display: 'flex', gap: '0.25rem' }}>
+            {[0.5, 1, 5].map((value) => (
+              <button
+                key={value}
+                onClick={() => {
+                  setSlippage(value)
+                  setIsCustomSlippage(false)
+                  setCustomSlippage('')
+                }}
+                style={{
+                  padding: '0.25rem 0.5rem',
+                  border: '1px solid #007bff',
+                  borderRadius: '0.5rem',
+                  background: slippage === value && !isCustomSlippage ? '#007bff' : 'transparent',
+                  color: slippage === value && !isCustomSlippage ? 'white' : '#007bff',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem',
+                  fontWeight: '500',
+                }}
+              >
+                {value}%
+              </button>
+            ))}
+            <input
+              type='text'
+              value={customSlippage}
+              onChange={(e) => {
+                const value = e.target.value
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  setCustomSlippage(value)
+                  if (value !== '') {
+                    const numValue = parseFloat(value)
+                    if (!isNaN(numValue) && numValue >= 0 && numValue <= 50) {
+                      setSlippage(numValue)
+                      setIsCustomSlippage(true)
+                    }
+                  }
+                }
+              }}
+              placeholder='Custom'
+              style={{
+                width: '60px',
+                padding: '0.25rem 0.5rem',
+                border: '1px solid #007bff',
+                borderRadius: '0.5rem',
+                background: isCustomSlippage ? '#007bff' : 'transparent',
+                color: isCustomSlippage ? 'white' : '#007bff',
+                fontSize: '0.8rem',
+                textAlign: 'center',
+              }}
+            />
+            {isCustomSlippage && customSlippage && (
+              <span style={{ fontSize: '0.8rem', color: '#007bff' }}>%</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {!userAddress ? (

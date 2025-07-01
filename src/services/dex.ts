@@ -124,6 +124,7 @@ export async function onBalanceInput({
   swapType,
   setToAmount,
   setFromAmount,
+  slippage = 0.5,
 }: {
   amount: string
   tonConnectUI: TonConnectUI
@@ -133,6 +134,7 @@ export async function onBalanceInput({
   swapType: 'exactIn' | 'exactOut'
   setToAmount?: (amount: string) => void
   setFromAmount?: (amount: string) => void
+  slippage?: number
 }): Promise<void> {
   const tonClient = getTonClient('testnet')
   const factory = await getFactory(tonClient)
@@ -249,6 +251,7 @@ export async function handleFromSwapAction(
   fromToken: Token,
   toToken: Token,
   amount: string,
+  slippage: number = 0.5,
 ) {
   const tonClient = getTonClient('testnet')
   const factory = await getFactory(tonClient)
@@ -296,8 +299,9 @@ export async function handleFromSwapAction(
 
   const amountOut = await ammPool.getExpectedOut(vaultFrom.address, amountIn)
 
-  // slippage here
-  const swapPayloadCell = createJettonVaultSwapRequest(ammPool.address, false, amountOut)
+  // Apply slippage tolerance to minimum amount out
+  const minAmountOut = (amountOut * BigInt(Math.floor((100 - slippage) * 100))) / 10000n
+  const swapPayloadCell = createJettonVaultSwapRequest(ammPool.address, false, minAmountOut)
   const transferMsg = beginCell()
     .store(
       storeJettonTransfer({
