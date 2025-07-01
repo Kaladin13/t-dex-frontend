@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useTonConnectUI, useTonAddress, useTonConnectModal } from '@tonconnect/ui-react'
 import { useNetwork } from '../contexts/NetworkContext'
 import {
@@ -7,6 +7,7 @@ import {
   fetchTonBalance,
   handleFromSwapAction,
   getExchangeRate,
+  onJettonAddressInput,
 } from '../services/dex'
 import TokenSelector from './TokenSelector'
 import './Swap.css'
@@ -35,6 +36,9 @@ export default function Swap() {
   const [toAmount, setToAmount] = useState('')
   const [swapping, setSwapping] = useState(false)
   const [exchangeRates, setExchangeRates] = useState({ directRate: '1', reverseRate: '1' })
+  const [debouncedFromAmount, setDebouncedFromAmount] = useState('')
+  const [debouncedToAmount, setDebouncedToAmount] = useState('')
+  const [lastChangedField, setLastChangedField] = useState<'from' | 'to' | null>(null)
 
   const [tonConnectUI] = useTonConnectUI()
   const userAddress = useTonAddress()
@@ -86,6 +90,62 @@ export default function Swap() {
     updateExchangeRate()
   }, [fromToken, toToken, tonConnectUI, network])
 
+  // Debounce для fromAmount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFromAmount(fromAmount)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [fromAmount])
+
+  // Debounce для toAmount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedToAmount(toAmount)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [toAmount])
+
+  // Обработка debouncedFromAmount
+  useEffect(() => {
+    if (!debouncedFromAmount || !toToken || lastChangedField !== 'from') return
+
+    const updateToAmount = async () => {
+      await onBalanceInput({
+        amount: debouncedFromAmount,
+        tonConnectUI,
+        network,
+        fromToken,
+        toToken,
+        swapType: 'exactIn',
+        setToAmount,
+      })
+    }
+
+    updateToAmount()
+  }, [debouncedFromAmount, toToken, tonConnectUI, network, fromToken, lastChangedField])
+
+  // Обработка debouncedToAmount
+  useEffect(() => {
+    if (!debouncedToAmount || !toToken || lastChangedField !== 'to') return
+
+    const updateFromAmount = async () => {
+      await onBalanceInput({
+        amount: debouncedToAmount,
+        tonConnectUI,
+        network,
+        fromToken,
+        toToken,
+        swapType: 'exactOut',
+        setFromAmount,
+      })
+    }
+
+    updateFromAmount()
+  }, [debouncedToAmount, toToken, tonConnectUI, network, fromToken, lastChangedField])
+
   const handleSwapDirection = () => {
     if (!toToken) return
     setFromToken(toToken)
@@ -96,9 +156,10 @@ export default function Swap() {
     setVaultAddressTo(vaultAddressFrom)
     setJettonAddressStatusFrom(jettonAddressStatusTo)
     setJettonAddressStatusTo(jettonAddressStatusFrom)
+    setLastChangedField(null)
   }
 
-  const handleFromAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
 
     // Разрешаем только цифры, точку и запятую
@@ -109,22 +170,10 @@ export default function Swap() {
 
     const val = inputValue.replace(/,/, '.')
     setFromAmount(val)
-    // setToAmount(val)
-
-    if (toToken) {
-      await onBalanceInput({
-        amount: val,
-        tonConnectUI,
-        network,
-        fromToken,
-        toToken,
-        swapType: 'exactIn',
-        setToAmount,
-      })
-    }
+    setLastChangedField('from')
   }
 
-  const handleToAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
 
     // Разрешаем только цифры, точку и запятую
@@ -135,19 +184,7 @@ export default function Swap() {
 
     const val = inputValue.replace(/,/, '.')
     setToAmount(val)
-    // setFromAmount(val)
-
-    if (toToken) {
-      await onBalanceInput({
-        amount: val,
-        tonConnectUI,
-        network,
-        fromToken,
-        toToken,
-        swapType: 'exactOut',
-        setFromAmount,
-      })
-    }
+    setLastChangedField('to')
   }
 
   const setAmountFromBalance = (fraction: number) => {
@@ -163,16 +200,14 @@ export default function Swap() {
       maximumFractionDigits: 20,
     })
     setFromAmount(amountString)
-    // Also trigger the dependent updates
-    handleFromAmountChange({
-      target: { value: amountString },
-    } as React.ChangeEvent<HTMLInputElement>)
+    setLastChangedField('from')
   }
 
   const handleFromTokenSelect = (token: Token) => {
     setFromToken(token)
     setFromAmount('')
     setToAmount('')
+    setLastChangedField(null)
     // console.log(token)
 
     if (token.type === 'jetton') {
@@ -186,6 +221,7 @@ export default function Swap() {
     setToToken(token)
     setFromAmount('')
     setToAmount('')
+    setLastChangedField(null)
     // console.log(token)
 
     if (token.type === 'jetton') {
@@ -222,9 +258,60 @@ export default function Swap() {
 
   const { directRate, reverseRate } = exchangeRates
 
+  const handleQuickTest = async () => {
+    try {
+      // Очищаем состояние
+      setFromAmount('')
+      setToAmount('')
+      setLastChangedField(null)
+      
+      // Загружаем первый токен
+      await onJettonAddressInput({
+        address: 'kQBCzXhQNxS727KxwsHld8aVNoFpSka0Xzr3GUBOxC_l2gQM',
+        tonConnectUI,
+        network,
+        setVaultAddress: setVaultAddressFrom,
+        onSelect: handleFromTokenSelect,
+      })
+      
+      // Загружаем второй токен
+      await onJettonAddressInput({
+        address: 'kQDO8Rt30nYL8RbXOWWMCqY3E4o-mN-tum0MTlABiFTDtz2p',
+        tonConnectUI,
+        network,
+        setVaultAddress: setVaultAddressTo,
+        onSelect: handleToTokenSelect,
+      })
+      
+      setJettonAddressStatusFrom('success')
+      setJettonAddressStatusTo('success')
+    } catch (error) {
+      console.error('Error in quick test:', error)
+      setJettonAddressStatusFrom('error')
+      setJettonAddressStatusTo('error')
+    }
+  }
+
   return (
     <div className='swap-card'>
-      <h2>Swap</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h2>Swap</h2>
+        <button
+          onClick={handleQuickTest}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}
+        >
+          Quick Test
+        </button>
+      </div>
       <div className='swap-section'>
         <div className='token-select-header'>
           <span>From</span>
