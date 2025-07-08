@@ -1,14 +1,14 @@
-import {Buffer} from "buffer"
+import { Buffer } from 'buffer'
 
 declare global {
   interface Window {
-    Buffer: typeof Buffer;
+    Buffer: typeof Buffer
     process: {
-      env: Record<string, string | undefined>;
-    };
+      env: Record<string, string | undefined>
+    }
   }
 }
 
-window.Buffer = Buffer;
+window.Buffer = Buffer
 
-export {};
+export {}

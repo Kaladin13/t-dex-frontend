@@ -12,9 +12,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const [network, setNetwork] = useState<Network>('testnet')
 
   return (
-    <NetworkContext.Provider value={{ network, setNetwork }}>
-      {children}
-    </NetworkContext.Provider>
+    <NetworkContext.Provider value={{ network, setNetwork }}>{children}</NetworkContext.Provider>
   )
 }
 
@@ -24,4 +22,4 @@ export const useNetwork = () => {
     throw new Error('useNetwork must be used within a NetworkProvider')
   }
   return context
-} 
+}

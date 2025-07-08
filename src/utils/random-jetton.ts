@@ -1,10 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { JettonFormData } from '../types/minter'
 
-const DICEBEAR_STYLES = [
-  'bottts',
-  'fun-emoji',
-]
+const DICEBEAR_STYLES = ['bottts', 'fun-emoji']
 
 const generateRandomAvatarUrl = () => {
   const style = DICEBEAR_STYLES[Math.floor(Math.random() * DICEBEAR_STYLES.length)]

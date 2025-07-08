@@ -80,13 +80,13 @@ export default function TokenSelector({
     setMode(value)
     setOpen(false)
     if (value === 'ton') {
-      setCustomAddress('');
-      setHasTyped(false);
+      setCustomAddress('')
+      setHasTyped(false)
       const ton = tokens.find((t) => t.type === 'ton')
       if (ton) onSelect(ton)
     } else {
-      setCustomAddress('');
-      setHasTyped(false);
+      setCustomAddress('')
+      setHasTyped(false)
       onSelect({
         type: 'jetton',
         symbol: 'JETTON',
@@ -100,12 +100,19 @@ export default function TokenSelector({
   }
 
   const showPreview =
-    mode === 'ton' || (mode === 'jetton' && selected && selected.type === 'jetton' && selected.address && selected.symbol && selected.logo && hasTyped);
+    mode === 'ton' ||
+    (mode === 'jetton' &&
+      selected &&
+      selected.type === 'jetton' &&
+      selected.address &&
+      selected.symbol &&
+      selected.logo &&
+      hasTyped)
 
   const handleCustomAddressChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const addr = e.target.value;
-    setCustomAddress(addr);
-    setHasTyped(true);
+    const addr = e.target.value
+    setCustomAddress(addr)
+    setHasTyped(true)
     onSelect({
       type: 'jetton',
       symbol: 'JETTON',
@@ -114,9 +121,9 @@ export default function TokenSelector({
       balance: 0n,
       address: addr,
       vaultAddress: '',
-    });
+    })
     if (setJettonAddressStatus) {
-      setJettonAddressStatus(undefined);
+      setJettonAddressStatus(undefined)
     }
     try {
       await onJettonAddressInput({
@@ -125,14 +132,14 @@ export default function TokenSelector({
         network,
         setVaultAddress: setVaultAddress,
         onSelect,
-      });
-      if (setJettonAddressStatus) setJettonAddressStatus('success');
+      })
+      if (setJettonAddressStatus) setJettonAddressStatus('success')
     } catch (err) {
-      if (setJettonAddressStatus) setJettonAddressStatus('error');
+      if (setJettonAddressStatus) setJettonAddressStatus('error')
 
-      toast.error(typeof err === 'string' ? err : (err instanceof Error ? err.message : String(err)))
+      toast.error(typeof err === 'string' ? err : err instanceof Error ? err.message : String(err))
     }
-  };
+  }
 
   const getLogoSrc = (token: Token) => {
     if (token.logo) return token.logo
@@ -142,7 +149,7 @@ export default function TokenSelector({
 
   // Helper to truncate addresses
   const truncateAddress = (addr: string) =>
-    addr.length > 12 ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : addr;
+    addr.length > 12 ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : addr
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -173,7 +180,11 @@ export default function TokenSelector({
         >
           {showPreview && selected ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexGrow: 1 }}>
-              <img src={getLogoSrc(selected)} alt={`${selected.symbol} logo`} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+              <img
+                src={getLogoSrc(selected)}
+                alt={`${selected.symbol} logo`}
+                style={{ width: 24, height: 24, borderRadius: '50%' }}
+              />
               <span style={{ fontWeight: 'bold' }}>{selected.name}</span>
             </div>
           ) : (
@@ -235,26 +246,24 @@ export default function TokenSelector({
             marginTop: 4,
             padding: '0.75rem',
             borderRadius: 12,
-            border:
-              !hasTyped
-                ? 'none'
-                : jettonAddressStatus === 'error'
+            border: !hasTyped
+              ? 'none'
+              : jettonAddressStatus === 'error'
                 ? '1.5px solid #f85149'
                 : jettonAddressStatus === 'success'
-                ? '1.5px solid #3fb950'
-                : 'none',
+                  ? '1.5px solid #3fb950'
+                  : 'none',
             background: '#23262f',
             color: '#fff',
             fontSize: '1.1rem',
             outline: 'none',
-            boxShadow:
-              !hasTyped
-                ? undefined
-                : jettonAddressStatus === 'error'
+            boxShadow: !hasTyped
+              ? undefined
+              : jettonAddressStatus === 'error'
                 ? '0 0 0 2px #f8514933'
                 : jettonAddressStatus === 'success'
-                ? '0 0 0 2px #3fb95033'
-                : undefined,
+                  ? '0 0 0 2px #3fb95033'
+                  : undefined,
             transition: 'border 0.2s, box-shadow 0.2s',
           }}
         />

@@ -4,7 +4,7 @@
   padding: 1.5rem;
   background: #181a20;
   border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -69,8 +69,6 @@
   color: #555;
 }
 
-
-
 .amount-setter {
   display: flex;
   justify-content: flex-end;
@@ -113,8 +111,11 @@
   color: #00aaff;
   cursor: pointer;
   margin: 0.25rem 0;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0,170,255,0.04);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 170, 255, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,7 +124,7 @@
 .swap-direction:hover {
   background: #00aaff22;
   border-color: #00aaff;
-  box-shadow: 0 4px 16px rgba(0,170,255,0.15);
+  box-shadow: 0 4px 16px rgba(0, 170, 255, 0.15);
 }
 
 .swap-direction:active {
@@ -194,15 +195,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(0,170,255,0.04);
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 170, 255, 0.04);
   height: 3rem;
   box-sizing: border-box;
 }
-.tact-dropdown-btn:focus, .tact-dropdown-btn:hover {
+.tact-dropdown-btn:focus,
+.tact-dropdown-btn:hover {
   background: #1a2233;
   color: #00aaff;
-  box-shadow: 0 4px 16px rgba(0,170,255,0.10);
+  box-shadow: 0 4px 16px rgba(0, 170, 255, 0.1);
 }
 
 .tact-dropdown-menu {
@@ -212,7 +216,7 @@
   width: 100%;
   background: #23262f;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,170,255,0.10);
+  box-shadow: 0 4px 16px rgba(0, 170, 255, 0.1);
   z-index: 10;
   overflow: hidden;
   border: 1px solid #00aaff33;
@@ -223,10 +227,13 @@
   cursor: pointer;
   color: #fff;
   font-size: 1.05rem;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   background: none;
 }
-.tact-dropdown-item:hover, .tact-dropdown-item:focus {
+.tact-dropdown-item:hover,
+.tact-dropdown-item:focus {
   background: #00aaff22 !important;
   color: #00aaff !important;
 }
@@ -237,23 +244,25 @@
 }
 
 /* Custom input for jetton address */
-.swap-section input[type="text"] {
+.swap-section input[type='text'] {
   background: #181a20;
   border: 1px solid #00aaff33;
   color: #fff;
   border-radius: 12px;
   padding: 0.75rem;
   font-size: 1.1rem;
-  transition: border 0.2s, box-shadow 0.2s;
+  transition:
+    border 0.2s,
+    box-shadow 0.2s;
 }
-.swap-section input[type="text"]:focus {
+.swap-section input[type='text']:focus {
   border: 1.5px solid #00aaff;
   box-shadow: 0 0 0 2px #00aaff33;
   outline: none;
 }
 
 /* Make address input same size as dropdown */
-.tact-dropdown + input[type="text"] {
+.tact-dropdown + input[type='text'] {
   width: 180px;
   background: #23262f;
   border-radius: 12px;
@@ -262,11 +271,13 @@
   border: none;
   color: #fff;
   margin-top: 0.5rem;
-  transition: box-shadow 0.2s, border 0.2s;
-  box-shadow: 0 2px 8px rgba(0,170,255,0.04);
+  transition:
+    box-shadow 0.2s,
+    border 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 170, 255, 0.04);
 }
-.tact-dropdown + input[type="text"]:focus {
-  box-shadow: 0 4px 16px rgba(0,170,255,0.10);
+.tact-dropdown + input[type='text']:focus {
+  box-shadow: 0 4px 16px rgba(0, 170, 255, 0.1);
   border: 1.5px solid #00aaff;
   background: #1a2233;
 }

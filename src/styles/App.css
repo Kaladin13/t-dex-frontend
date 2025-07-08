@@ -209,5 +209,5 @@ body {
 /* Add viewport meta tag to ensure proper scaling on mobile devices */
 @viewport {
   width: device-width;
-  zoom: 1.0;
-} 
+  zoom: 1;
+}
