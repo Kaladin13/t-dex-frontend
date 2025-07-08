@@ -1,0 +1,27 @@
+# Dependencies and build artifacts
+.yarn/
+.pnp.*
+node_modules/
+dist/
+build/
+
+# Public assets
+public/
+index.html
+
+# GitHub workflows
+.github/
+
+# Documentation
+README.md
+
+# Config files
+*.config.js
+*.config.ts
+vite.config.ts
+eslint.config.js
+tsconfig.*
+
+# Lock files
+yarn.lock
+package-lock.json

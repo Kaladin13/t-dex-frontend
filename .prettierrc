@@ -10,6 +10,5 @@
   "bracketSpacing": true,
   "bracketSameLine": false,
   "endOfLine": "auto",
-  "singleAttributePerLine": true,
-  "insertFinalNewline": true
+  "singleAttributePerLine": true
 }
